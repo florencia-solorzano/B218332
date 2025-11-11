@@ -3,3 +3,151 @@ title: "Assessment"
 output: html_document
 ---
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Seasonal depression and antidepressant prescriptions
+
+## Brrr: Cold, long and sad winter days
+
+Coming from Peru to Scotland was not only a cultural shock but an environmental one, if you will. I had never experienced such strikingly beautiful but equally emotionally debilitating winters. In Scotland, daylight is precious despite its scarcity and temperatures above 2 degrees are to dream of. And here, is when I first heard the term 'Seasonal depression' being used the most at this time of the year, Autumn; whereas it's a passing comment from a friend, a sitcom joke, or a genuine Google search during those long, dark, and cold winter days when you feel extra homesick.\
+Throughout my time in Scotland I have wondered if seasonal depression is more a myth than a reality but have never quite gathered more than qualitative data in the form of conversations with friends and acquaintances. Therefore, I have decided to quantify these verbal leads through this report.
+
+## Investigation breakdown
+
+The research question to be explored is:
+
+> To what extent do seasonal variations relating to daylight hours and temperature affect antidepressant prescribing rates across Scottish NHS Health Boards?
+
+### Variables
+
+The data time frame to be used is from March 2024 to March 2025 to assess the potential cyclicality of results and make adequate comparison between seasons.
+
+#### Season Categorisation
+
+**Spring**: March, April, May\
+**Summer**: June, July, August\
+**Autumn**: September, October, November\
+**Winter**: December, January, February\
+
+#### Antidepressant Prescriptions
+
+Raw data from multiple institutional websites include all medications prescribed by NHS Health Boards. To differentiate and include only Antidepressant prescriptions, only prescriptions with a BNF item code starting with **'0403'** will be used.
+
+This report aims to be a multi-factorial exploration of the environmental and social dimensions of antidepressant prescription rates in Scotland given that it's analysis will focus on three distinct aspects as shown in the hypotheses.
+
+### Hypotheses
+
+This report puts forward an overarching hypothesis:
+
+> **Null (*H~0~*)**: Antidepressant prescription rates do not have seasonal patterns.
+
+> **Alternative (*H~a~*)**: Antidepressant prescription rates have seasonal patterns.
+
+Where within *H~a~*, the following is proposed:
+
+> **1a.** Prescription rates increase during shorter months with shorter daylight hours and colder temperatures (autumn and winter) and decrease during those with longer daylight hours and warmer temperature (spring and summer).
+
+In the assumption that *H~a~* is true, this report proposed two further sub-hypotheses that further enrich the multi-factorial lens through which seasonal effects inlfuence prescription rates:
+
+> > **I.** The latitude of prescribing NHS Health Boards further influences the seasonality of antidepressant prescription rates, the more northern a health board is, the heavier the impact of these seasonal patterns.
+
+> > **II.** Areas with a higher socioeconomic deprivation index (SMID) will have a consistently higher benchmark antidepressant use regardless of season, making the impact of varying daylight hours and temperature be even greater.
+
+## Introduction to Data
+
+### Health Board Data
+
+January to June 2024: <https://www.opendata.nhs.scot/dataset/84393984-14e9-4b0d-a797-b288db64d088/resource/f0df380b-3f9b-4536-bb87-569e189b727a/download/hb_pitc2024_01_06-1.csv>\
+
+July to December 2024: <https://www.opendata.nhs.scot/dataset/84393984-14e9-4b0d-a797-b288db64d088/resource/f3b9f2e2-66c0-4310-9b8e-734781d2ed0a/download/hb_pitc2024_07_12-1.csv>\
+
+January to June 2025: <https://www.opendata.nhs.scot/dataset/84393984-14e9-4b0d-a797-b288db64d088/resource/9de908b3-9c28-4cc3-aa32-72350a0579d1/download/hb_pitc2025_01_06.csv>
+
+### Met Office Seasonal Data
+
+North Scotland:\
+Daylight hrs - <https://www.metoffice.gov.uk/pub/data/weather/uk/climate/datasets/Sunshine/ranked/Scotland_N.txt>\
+Temperature - <https://www.metoffice.gov.uk/pub/data/weather/uk/climate/datasets/Tmean/date/Scotland_N.txt>\
+
+East Scotland:\
+Daylight hrs - <https://www.metoffice.gov.uk/pub/data/weather/uk/climate/datasets/Sunshine/ranked/Scotland_E.txt>\
+Temperature - <https://www.metoffice.gov.uk/pub/data/weather/uk/climate/datasets/Tmean/date/Scotland_E.txt>\
+
+West Scotland:\
+Daylight hrs - <https://www.metoffice.gov.uk/pub/data/weather/uk/climate/datasets/Sunshine/ranked/Scotland_W.txt>\
+Temperature - <https://www.metoffice.gov.uk/pub/data/weather/uk/climate/datasets/Tmean/date/Scotland_W.txt>\
+
+### Scottish Index of Multiple Deprivation (SMID quintiles) Data
+
+Taken from the Public Health Scotland website:\
+<https://www.opendata.nhs.scot/dataset/78d41fa9-1a62-4f7b-9edb-3e8522a93378/resource/acade396-8430-4b34-895a-b3e757fa346e/download/simd2020v2_22062020.csv>
+
+### NHS Health Board Total Population Data
+
+Also taken from the Public Health Scotland website:\
+<https://www.opendata.nhs.scot/dataset/gp-practice-populations>
+
+## Methodology
+
+1.  Load all the required libraries on RStudio
+
+```{r}
+library(tidyverse)
+library(here) # for the upkeep of the directory structure
+library(janitor) # for data cleaning
+library(gt) # for table building
+
+```
+
+2.  Load all the Health Board Data (January 2024:June 2025) into RStudio and use the `janitor` package by using the `clean_names()` function to have uniform names throughout datasets
+
+```{r}
+prescr_jan_june_2024 <- read_csv("https://www.opendata.nhs.scot/dataset/84393984-14e9-4b0d-a797-b288db64d088/resource/f0df380b-3f9b-4536-bb87-569e189b727a/download/hb_pitc2024_01_06-1.csv") %>% 
+  clean_names()
+
+prescr_july_dec_2024 <- read_csv("https://www.opendata.nhs.scot/dataset/84393984-14e9-4b0d-a797-b288db64d088/resource/f3b9f2e2-66c0-4310-9b8e-734781d2ed0a/download/hb_pitc2024_07_12-1.csv") %>% 
+  clean_names()
+
+prescr_jan_june_2025 <- read_csv("https://www.opendata.nhs.scot/dataset/84393984-14e9-4b0d-a797-b288db64d088/resource/9de908b3-9c28-4cc3-aa32-72350a0579d1/download/hb_pitc2025_01_06.csv") %>% 
+  clean_names()
+
+```
+
+3.  Now filter out by "bnf_item_code" to keep only those prescriptions that are antidepressants (codes starting with '0403') and that were prescribed within our selected time frame (March 2024 - March 2025). Make sure to maintain the following: hbt, bnf_item_description, number_of_paid_items, and paid_date_month. Repeat for all Health Board datasets.
+
+```{r}
+antidepr_march_june_2024 <- prescr_jan_june_2024 %>% 
+  filter(str_detect(bnf_item_code, "^0403")) %>%
+  filter(paid_date_month != "202401" & paid_date_month != "202402") %>%
+  select(c(hbt,bnf_item_code,bnf_item_description,number_of_paid_items,paid_date_month)) %>% 
+  group_by(hbt, paid_date_month) %>%
+  summarise(number_of_items = sum(number_of_paid_items, na.rm = TRUE)) %>% 
+  arrange(paid_date_month)
+
+antidepr_july_dec_2024 <- prescr_july_dec_2024 %>% 
+  filter(str_detect(bnf_item_code, "^0403")) %>%
+  select(c(hbt,bnf_item_code,bnf_item_description,number_of_paid_items,paid_date_month)) %>% 
+  group_by(hbt, paid_date_month) %>%
+  summarise(number_of_items = sum(number_of_paid_items, na.rm = TRUE)) %>% 
+  arrange(paid_date_month)
+
+antidepr_jan_march_2025 <- prescr_jan_june_2025 %>% 
+  filter(str_detect(bnf_item_code, "^0403")) %>%
+  filter(paid_date_month != "202504" & paid_date_month != "202505" & paid_date_month != "202506") %>%
+  select(c(hbt,bnf_item_code,bnf_item_description,number_of_paid_items,paid_date_month)) %>% 
+  group_by(hbt, paid_date_month) %>%
+  summarise(number_of_items = sum(number_of_paid_items, na.rm = TRUE)) %>% 
+  arrange(paid_date_month)
+```
+
+4. Join the three antidepressant datasets to create a unified March 2024-March 2025 prescription data object.
+```{r}
+yearly_antidepr_data <- antidepr_march_june_2024 %>% 
+full_join(antidepr_july_dec_2024)
+
+yearly_antidepr_data <- yearly_antidepr_data %>% 
+  full_join(antidepr_jan_march_2025)
+```
+

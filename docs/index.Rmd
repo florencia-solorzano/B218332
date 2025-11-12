@@ -87,11 +87,13 @@ Taken from the Public Health Scotland website:\
 ### NHS Health Board Total Population Data
 
 Also taken from the Public Health Scotland website:\
-<https://www.opendata.nhs.scot/dataset/gp-practice-populations>
+<https://www.opendata.nhs.scot/dataset/e3300e98-cdd2-4f4e-a24e-06ee14fcc66c/resource/cec9341e-ccba-4c71-afe4-a614f5e97b9f/download/practice_listsizes_oct2024-open-data.csv>
 
 ## Methodology
 
-1.  Load all the required libraries on RStudio
+### 1. Data Wrangling and Merging
+
+1.1 Load all the required libraries on RStudio
 
 ```{r}
 library(tidyverse)
@@ -101,7 +103,7 @@ library(gt) # for table building
 
 ```
 
-2.  Load all the Health Board Data (January 2024:June 2025) into RStudio and use the `janitor` package by using the `clean_names()` function to have uniform names throughout datasets
+1.2 Load all the Health Board Data (January 2024:June 2025) into RStudio and use the `janitor` package by using the `clean_names()` function to have uniform names throughout datasets
 
 ```{r}
 prescr_jan_june_2024 <- read_csv("https://www.opendata.nhs.scot/dataset/84393984-14e9-4b0d-a797-b288db64d088/resource/f0df380b-3f9b-4536-bb87-569e189b727a/download/hb_pitc2024_01_06-1.csv") %>% 
@@ -115,7 +117,7 @@ prescr_jan_june_2025 <- read_csv("https://www.opendata.nhs.scot/dataset/84393984
 
 ```
 
-3.  Now filter out by "bnf_item_code" to keep only those prescriptions that are antidepressants (codes starting with '0403') and that were prescribed within our selected time frame (March 2024 - March 2025). Make sure to maintain the following: hbt, bnf_item_description, number_of_paid_items, and paid_date_month. Repeat for all Health Board datasets.
+1.3 Now filter out by "bnf_item_code" to keep only those prescriptions that are antidepressants (codes starting with '0403') and that were prescribed within our selected time frame (March 2024 - March 2025). Make sure to maintain the following: hbt, bnf_item_description, number_of_paid_items, and paid_date_month. Repeat for all Health Board datasets.
 
 ```{r}
 antidepr_march_june_2024 <- prescr_jan_june_2024 %>% 
@@ -142,7 +144,8 @@ antidepr_jan_march_2025 <- prescr_jan_june_2025 %>%
   arrange(paid_date_month)
 ```
 
-4. Join the three antidepressant datasets to create a unified March 2024-March 2025 prescription data object.
+1.4 Join the three antidepressant datasets to create a unified March 2024-March 2025 prescription data object.
+
 ```{r}
 yearly_antidepr_data <- antidepr_march_june_2024 %>% 
 full_join(antidepr_july_dec_2024)
@@ -151,3 +154,54 @@ yearly_antidepr_data <- yearly_antidepr_data %>%
   full_join(antidepr_jan_march_2025)
 ```
 
+1.5 Create object for geographical NHS Health Board names. Then, `full_join()` the dataset with the yearly_antidepr_data object created in the previous step.
+
+```{r}
+hb_names <- read_csv("https://www.opendata.nhs.scot/dataset/9f942fdb-e59e-44f5-b534-d6e17229cc7b/resource/652ff726-e676-4a20-abda-435b98dd7bdc/download/hb14_hb19.csv") %>% 
+  clean_names()
+
+population_antidepr_yearly <- yearly_antidepr_data %>% 
+  full_join(hb_names, join_by(hbt == hb)) %>% 
+  select(-c(hb_date_archived, hb_date_archived, hb_date_enacted, country))
+```
+
+1.6 Notes at this stage:
+
+-   After the `full_join()` there are 4 rows with NA in prescription data (paid_date_month and number_or_items). Upon further investigation and a look at the object hb_names, these were shown to have had their hbt numbers archived in 2018 and 2019, making them easily removable from our data.
+-   There is a row with hbt 'SB0806' which shows NA for hb_name though has antidepressant prescription data for December 2024 only. Given the value ('2') is extremely low and this hbt is not on record or appears any other time, it has been decided to be excluded from the analysis.
+
+```{r}
+clean_hbt_antidepr_yearly <- population_antidepr_yearly %>% 
+  filter(!is.na(hb_name)) %>% 
+  filter(!is.na(paid_date_month))
+```
+
+1.7 Load, wrangle and organise NHS Health Board population data from the data file from October 2024. The date chosen is deliberate as October 2024 marks approximately half-way through the determined time period that this investigation is focusing on.
+
+```{r}
+hb_pop_oct_2024 <- read_csv("https://www.opendata.nhs.scot/dataset/e3300e98-cdd2-4f4e-a24e-06ee14fcc66c/resource/cec9341e-ccba-4c71-afe4-a614f5e97b9f/download/practice_listsizes_oct2024-open-data.csv") %>% 
+  clean_names()
+
+clean_hb_population <- hb_pop_oct_2024 %>%
+  select(hb, sex, all_ages) %>%
+  filter(!sex %in% c("Male", "Female")) %>% 
+  group_by(hb) %>% 
+  summarise(hb_population = sum(all_ages))
+```
+
+1.8 Introduce population data for each NHS health board.
+
+```{r}
+antidepr_yearly_hb_pop <- clean_hbt_antidepr_yearly %>% 
+  full_join(clean_hb_population, join_by(hbt == hb))
+```
+
+1.9 Now lets introduce the daylight hours data from the UK Met Office. Given the nature of the .txt files, I converted them into .csv files using Excel. These files can be found in the 'data' folder attached.
+
+```{r}
+daylight_north_scot <- read_table("data/R_north_scotland_sunshine.csv")
+
+daylight_east_scot <- read_table("data/R_east_scotland_sunshine.csv")
+
+daylight_west_scot <- read_table("data/R_west_scotland_sunshine.csv")
+```

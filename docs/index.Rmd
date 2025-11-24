@@ -31,6 +31,14 @@ The data time frame to be used is from March 2024 to March 2025 to assess the po
 **Autumn**: September, October, November\
 **Winter**: December, January, February\
 
+#### NHS Health Board Geographical Categorisation
+
+This categorisation has been made according to the Met Office's territorial delineation of Scotland based on the distribution of climate measurements as available in their website.
+
+**Northern Scotland**: NHS Highland, NHS Western Isles, NHS Orkney, NHS Shetland\
+**Eastern Scotland**: NHS Borders, NHS Lothian, NHS Fife, NHS Tayside, NHS Grampian, NHS Forth Valley\
+**Western Scotland**: NHS Ayrshire and Arran, NHS Dumfries and Galloway, NHS Greater Glasgow and Clyde, NHS Lanarkshire
+
 #### Antidepressant Prescriptions
 
 Raw data from multiple institutional websites include all medications prescribed by NHS Health Boards. To differentiate and include only Antidepressant prescriptions, only prescriptions with a BNF item code starting with **'0403'** will be used.
@@ -144,23 +152,51 @@ antidepr_jan_march_2025 <- prescr_jan_june_2025 %>%
   arrange(paid_date_month)
 ```
 
-1.4 Join the three antidepressant datasets to create a unified March 2024-March 2025 prescription data object.
+1.4 Join the three antidepressant datasets to create a unified March 2024-March 2025 prescription data object. Then, create an object for seasonal categorisations and merge it with the unified object created.
 
 ```{r}
+spr_months_202425 <- c(202403, 202404, 202405, 202503)
+sum_months_202425 <- c(202406, 202407, 202408)
+aut_months_202425 <- c(202409, 202410, 202411)
+win_months_202425 <- c(202412, 202501, 202502)
+
+seasons_202425 <- tibble(
+  month = c(spr_months_202425, sum_months_202425, aut_months_202425, win_months_202425),
+  season = c(rep("spr", length(spr_months_202425)),
+             rep("sum", length(sum_months_202425)),
+             rep("aut", length(aut_months_202425)),
+             rep("win", length(win_months_202425))))
+
 yearly_antidepr_data <- antidepr_march_june_2024 %>% 
 full_join(antidepr_july_dec_2024)
 
 yearly_antidepr_data <- yearly_antidepr_data %>% 
-  full_join(antidepr_jan_march_2025)
+  full_join(antidepr_jan_march_2025) %>% 
+  full_join(seasons_202425, join_by(paid_date_month == month))
+  
 ```
 
-1.5 Create object for geographical NHS Health Board names. Then, `full_join()` the dataset with the yearly_antidepr_data object created in the previous step.
+1.5 Create an object for geographical NHS Health Board names. Make each health board be geographically named to match Met Office data later on. Then, `full_join()` the dataset with the yearly_antidepr_data object created in the previous step.
 
 ```{r}
-hb_names <- read_csv("https://www.opendata.nhs.scot/dataset/9f942fdb-e59e-44f5-b534-d6e17229cc7b/resource/652ff726-e676-4a20-abda-435b98dd7bdc/download/hb14_hb19.csv") %>% 
-  clean_names()
+north_hb <- c("NHS Highland", "NHS Western Isles", "NHS Orkney", "NHS Shetland")
+east_hb <- c("NHS Borders", "NHS Lothian", "NHS Fife", "NHS Tayside", "NHS Grampian", "NHS Forth Valley")
+west_hb <- c("NHS Ayrshire and Arran", "NHS Dumfries and Galloway", "NHS Greater Glasgow and Clyde", "NHS Lanarkshire")
 
-population_antidepr_yearly <- yearly_antidepr_data %>% 
+
+metoffice_hb_region <- tibble(
+  hb_name = c(north_hb, east_hb, west_hb),
+  region = c(rep("north", length(north_hb)),
+             rep("east", length(east_hb)),
+             rep("west", length(west_hb))))
+
+
+hb_names <- read_csv("https://www.opendata.nhs.scot/dataset/9f942fdb-e59e-44f5-b534-d6e17229cc7b/resource/652ff726-e676-4a20-abda-435b98dd7bdc/download/hb14_hb19.csv") %>% 
+  clean_names() %>% 
+  full_join(metoffice_hb_region)
+  
+
+hbt_antidepr_yearly <- yearly_antidepr_data %>% 
   full_join(hb_names, join_by(hbt == hb)) %>% 
   select(-c(hb_date_archived, hb_date_archived, hb_date_enacted, country))
 ```
@@ -171,7 +207,7 @@ population_antidepr_yearly <- yearly_antidepr_data %>%
 -   There is a row with hbt 'SB0806' which shows NA for hb_name though has antidepressant prescription data for December 2024 only. Given the value ('2') is extremely low and this hbt is not on record or appears any other time, it has been decided to be excluded from the analysis.
 
 ```{r}
-clean_hbt_antidepr_yearly <- population_antidepr_yearly %>% 
+clean_hbt_antidepr_yearly <- hbt_antidepr_yearly %>% 
   filter(!is.na(hb_name)) %>% 
   filter(!is.na(paid_date_month))
 ```
@@ -196,7 +232,7 @@ antidepr_yearly_hb_pop <- clean_hbt_antidepr_yearly %>%
   full_join(clean_hb_population, join_by(hbt == hb))
 ```
 
-1.9 Now lets introduce the daylight hours data from the UK Met Office. Given the nature of the .txt files, I converted them into .csv files using Excel. These files can be found in the 'data' folder attached.
+1.9 Now let's introduce the daylight hours data from the UK Met Office. Given the nature of the .txt files, I converted them into .csv files using Excel. These files can be found in the 'data' folder attached.
 
 ```{r}
 daylight_north_scot <- read_table("data/R_north_scotland_sunshine.csv")
@@ -204,4 +240,192 @@ daylight_north_scot <- read_table("data/R_north_scotland_sunshine.csv")
 daylight_east_scot <- read_table("data/R_east_scotland_sunshine.csv")
 
 daylight_west_scot <- read_table("data/R_west_scotland_sunshine.csv")
+```
+
+1.10 Upon inspection of the data, one can notice that there are specific columns for each season apart from one for each month. This report will be using the seasonal data to make the merging processes easier. Now, each daylight hours object will be cleaned and wrangled to only have March 2024-March 2025 data. The final object will be named all_seasons_daylight, which will contain all daylight hours per season per region for the March 2024-March 2025 analysis time period.
+
+```{r}
+# North of Scotland
+winter_daylight_north_2024_25 <- daylight_north_scot %>% 
+  select(win,year_12) %>% 
+  filter(year_12 == "2024") %>%  # December 2024, January 2025, and February 2025 are wanted
+  rename(year = year_12)
+
+spr_daylight_north_2024_25 <- daylight_north_scot %>% 
+  select(spr,year_13) %>% 
+  filter(year_13 == "2024" | year_13 == "2025") %>% # March 2024, April 2024, May 2024, *and March 2025* are wanted
+  rename(year = year_13)
+
+sum_daylight_north_2024_25 <- daylight_north_scot %>% 
+  select(sum,year_14) %>% 
+  filter(year_14 == "2024") %>%  # June 2024, July 2024, and August 2024 are wanted
+  rename(year = year_14)
+
+aut_daylight_north_2024_25 <- daylight_north_scot %>% 
+  select(aut,year_15) %>% 
+  filter(year_15 == "2024") %>% # September 2024, October 2024, and November 2024 are wanted
+  rename(year = year_15)
+
+season_daylight_north_complete <- winter_daylight_north_2024_25 %>% 
+  full_join(spr_daylight_north_2024_25, by = "year") %>% 
+  full_join(sum_daylight_north_2024_25, by = "year") %>% 
+  full_join(aut_daylight_north_2024_25, by = "year") %>% 
+  relocate(win, .after = aut) %>% 
+  mutate(across(spr:win, as.numeric)) %>% 
+  pivot_longer(cols = spr:win, names_to = "season", values_to = "daylight_hrs") %>% 
+  arrange(year, factor(season, levels = c("spr", "sum", "aut", "win"))) %>% 
+  mutate(region = "north") %>% 
+  filter(!is.na(daylight_hrs))
+
+# East of Scotland
+winter_daylight_east_2024_25 <- daylight_east_scot %>% 
+  select(win,year_12) %>% 
+  filter(year_12 == "2024") %>%  # December 2024, January 2025, and February 2025 are wanted
+  rename(year = year_12)
+
+spr_daylight_east_2024_25 <- daylight_east_scot %>% 
+  select(spr,year_13) %>% 
+  filter(year_13 == "2024" | year_13 == "2025") %>% # March 2024, April 2024, May 2024, *and March 2025* are wanted
+  rename(year = year_13)
+
+sum_daylight_east_2024_25 <- daylight_east_scot %>% 
+  select(sum,year_14) %>% 
+  filter(year_14 == "2024") %>%  # June 2024, July 2024, and August 2024 are wanted
+  rename(year = year_14)
+
+aut_daylight_east_2024_25 <- daylight_east_scot %>% 
+  select(aut,year_15) %>% 
+  filter(year_15 == "2024") %>% # September 2024, October 2024, and November 2024 are wanted
+  rename(year = year_15)
+
+season_daylight_east_complete <- winter_daylight_east_2024_25 %>% 
+  full_join(spr_daylight_east_2024_25, by = "year") %>% 
+  full_join(sum_daylight_east_2024_25, by = "year") %>% 
+  full_join(aut_daylight_east_2024_25, by = "year") %>% 
+  relocate(win, .after = aut) %>% 
+mutate(across(spr:win, as.numeric)) %>% 
+  pivot_longer(cols = spr:win, names_to = "season", values_to = "daylight_hrs") %>% 
+  arrange(year, factor(season, levels = c("spr", "sum", "aut", "win"))) %>% 
+  mutate(region = "east") %>% 
+  filter(!is.na(daylight_hrs))
+
+# West of Scotland
+winter_daylight_west_2024_25 <- daylight_west_scot %>% 
+  select(win,year_12) %>% 
+  filter(year_12 == "2024") %>%  # December 2024, January 2025, and February 2025 are wanted
+  rename(year = year_12)
+
+spr_daylight_west_2024_25 <- daylight_west_scot %>% 
+  select(spr,year_13) %>% 
+  filter(year_13 == "2024" | year_13 == "2025") %>% # March 2024, April 2024, May 2024, *and March 2025* are wanted
+  rename(year = year_13)
+
+sum_daylight_west_2024_25 <- daylight_west_scot %>% 
+  select(sum,year_14) %>% 
+  filter(year_14 == "2024") %>%  # June 2024, July 2024, and August 2024 are wanted
+  rename(year = year_14)
+
+aut_daylight_west_2024_25 <- daylight_west_scot %>% 
+  select(aut,year_15) %>% 
+  filter(year_15 == "2024") %>% # September 2024, October 2024, and November 2024 are wanted
+  rename(year = year_15)
+
+season_daylight_west_complete <- winter_daylight_west_2024_25 %>% 
+  full_join(spr_daylight_west_2024_25, by = "year") %>% 
+  full_join(sum_daylight_west_2024_25, by = "year") %>% 
+  full_join(aut_daylight_west_2024_25, by = "year") %>% 
+  relocate(win, .after = aut) %>% 
+  mutate(across(spr:win, as.numeric)) %>% 
+  pivot_longer(cols = spr:win, names_to = "season", values_to = "daylight_hrs") %>% 
+  arrange(year, factor(season, levels = c("spr", "sum", "aut", "win"))) %>% 
+  mutate(region = "west") %>% 
+  filter(!is.na(daylight_hrs))
+
+# Final 'season' object to be used for data merging with NHS Health Board prescription and population data
+all_seasons_daylight <- season_daylight_north_complete %>% 
+  full_join(season_daylight_east_complete) %>% 
+  full_join(season_daylight_west_complete)
+```
+
+1.11 Now daylight data will be inputted into the antidepr_yearly_hb_pop object as our final data merge, where categorisation of prescription data will follow seasonal categorisation (See Season Categorisation and NHS Health Board Geographical Categorisation).
+
+```{r}
+antidepr_season_hb_pop <- antidepr_yearly_hb_pop %>%
+  group_by(paid_date_month, region) %>% 
+  mutate(year = as.integer(substr(paid_date_month,1,4)),
+         month = as.integer(substr(paid_date_month, 5, 6)),
+         season = case_when(
+           month %in% 3:5  ~ "spr",
+           month %in% 6:8  ~ "sum",
+           month %in% 9:11 ~ "aut",
+           month %in% c(12,1,2) ~ "win"),
+         season_year = if_else(month %in% c(1, 2), year - 1, year)) %>%
+  full_join(all_seasons_daylight, by = c("season_year" = "year", "season", "region"))
+```
+
+### 2. Data Analysis
+
+2.1 For prescription data standardisation, a calculation of items_per_1000_people will be made. This is because all NHS Health Boards have different populations, thus, comparing ther number_of_items solely would not provide correct conclusions.
+
+```{r}
+antidepr_season_hb_pop <- antidepr_season_hb_pop %>% 
+  mutate(items_per_1000 = (number_of_items/hb_population)*1000)
+
+```
+
+2.2. Clean data table to provide foundation for data visualisation and analysis.
+
+```{r}
+analysis_antidepr_season <- antidepr_season_hb_pop %>% 
+  select(hbt, paid_date_month, hb_name, season, daylight_hrs, items_per_1000, year) %>%
+  group_by(region, season, paid_date_month) %>% 
+  summarise(av_daylight_hrs = mean(daylight_hrs), av_items_per_1000 = mean(items_per_1000)) %>% 
+  mutate(month = as.Date(paste0(paid_date_month, "01"), "%Y%m%d"))
+
+
+
+
+
+
+
+```
+
+### 3. Data Visualisation
+
+3.1 Composite graph showing standardised antidepressant prescription rates proportional to NHS Health Board population and average daylight hours per month from March 2024 to March 2025, faceted by Scottish Geographical Region (North, East, and West)
+
+```{r}
+library(ggplot2)
+library(ggtext)
+
+regional_analysis_composite <- analysis_antidepr_season
+ggplot(analysis_antidepr_season, aes(x = month)) +
+  geom_col(aes(y = av_daylight_hrs), fill = "skyblue", alpha = 0.6) +
+  geom_line(
+    aes(y = av_items_per_1000, color = "Antidepressant prescriptions per 1000 people"),
+    size = 1.2, group = 1) +
+  facet_wrap(~ region, ncol = 3, scales = "free_x") +
+  scale_y_continuous(
+    name = "Average Daylight Hours (hrs)",
+    sec.axis = sec_axis(~ ., name = "Average Antidepressant prescriptions (units/1000 people)")) +
+  scale_x_date(
+    date_labels = "%b\n%Y",
+    breaks = "1 month",
+    expand = c(0.01, 0.01)) +
+  scale_color_manual(values = c("Antidepressant prescriptions per 1000 people" = "darkred")) +
+  labs(
+    title = "Antidepressant prescriptions and Average Daylight hours from March 2024 - March 2025 by Scottish Geographical Region",
+    x = "Month",
+    caption = "Bars = Daylight Hours | Line = Antidepressant Prescriptions") +
+  theme_minimal(base_size = 13) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = "top",
+    legend.title = element_blank(),
+    strip.background = element_rect(fill = "gray90", color = NA),
+    strip.text = element_text(face = "bold", size = 12),
+    plot.title = element_textbox_simple(),
+    plot.margin = margin(t = 20, r = 10, b = 20, l = 10, unit = "pt"))
+ggsave("regional_analysis_composite.png",width = 20, height = 20, units = "cm")
+
+regional_analysis_composite
 ```

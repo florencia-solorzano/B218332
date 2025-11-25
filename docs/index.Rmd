@@ -538,29 +538,6 @@ map_antidepr_daylight
 
 3.4. Geospatial analysis of SMID quintiles and prescription analysis
 ```{r}
-map_smid <- analysis_geo_antidepr %>% 
-  ggplot() +
-  geom_sf(aes(fill = av_items_per_1000,
-              text = paste0(
-                "<b>NHS Board:</b> ", hb_name, "<br>",
-                "<b>Season:</b> ", season, "<br>",
-                "<b>Prescriptions per 1000:</b> ",
-                round(av_items_per_1000, 1), "<br>",
-                "<b>SMID Rank:</b> ", SMID_rank)),
-          colour = "grey20", size = 0.2) +
-  scale_fill_distiller(palette = "Blues", direction = 1) +
-  facet_wrap(~ season) +
-  labs(
-    title = "Antidepressant Prescriptions & SMID Rank per NHS HealthBoard",
-    fill = "Antidepressant Prescriptions per 1000") +
-  theme_void() +
-  theme(
-    plot.title = element_text(face = "bold", size = 14),
-    strip.text = element_text(face = "bold"))
-
-map_smid_interactive <- ggplotly(map_smid, tooltip = "text")
-
-map_smid_interactive
 
 # Bivariate map
 library(cowplot)

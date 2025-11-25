@@ -234,11 +234,11 @@ antidepr_yearly_hb_pop <- clean_hbt_antidepr_yearly %>%
 1.9 Now let's introduce the daylight hours data from the UK Met Office. Given the nature of the .txt files, I converted them into .csv files using Excel. These files can be found in the 'data' folder attached.
 
 ```{r}
-daylight_north_scot <- read_table("docs/data/R_north_scotland_sunshine.csv")
+daylight_north_scot <- read_table(here("docs","data", "R_north_scotland_sunshine.csv"))
 
-daylight_east_scot <- read_table("docs/data/R_east_scotland_sunshine.csv")
+daylight_east_scot <- read_table(here("docs","data", "R_east_scotland_sunshine.csv"))
 
-daylight_west_scot <- read_table("docs/data/R_west_scotland_sunshine.csv")
+daylight_west_scot <- read_table(here("docs","data","R_west_scotland_sunshine.csv"))
 ```
 
 1.10 Upon inspection of the data, one can notice that there are specific columns for each season apart from one for each month. This report will be using the seasonal data to make the merging processes easier. Now, each daylight hours object will be cleaned and wrangled to only have March 2024-March 2025 data (March 1st 2024 to February 28th, 2025). The final object will be named all_seasons_daylight, which will contain all daylight hours per season per region for the March 2024-March 2025 analysis time period.
@@ -534,5 +534,120 @@ map_antidepr_daylight <- map_antidepr_seasons / map_daylight_seasons +
   plot_layout(heights = c(1,1))
 
 map_antidepr_daylight
+```
+
+3.4. Geospatial analysis of SMID quintiles and prescription analysis
+```{r}
+map_smid <- analysis_geo_antidepr %>% 
+  ggplot() +
+  geom_sf(aes(fill = av_items_per_1000,
+              text = paste0(
+                "<b>NHS Board:</b> ", hb_name, "<br>",
+                "<b>Season:</b> ", season, "<br>",
+                "<b>Prescriptions per 1000:</b> ",
+                round(av_items_per_1000, 1), "<br>",
+                "<b>SMID Rank:</b> ", SMID_rank)),
+          colour = "grey20", size = 0.2) +
+  scale_fill_distiller(palette = "Blues", direction = 1) +
+  facet_wrap(~ season) +
+  labs(
+    title = "Antidepressant Prescriptions & SMID Rank per NHS HealthBoard",
+    fill = "Antidepressant Prescriptions per 1000") +
+  theme_void() +
+  theme(
+    plot.title = element_text(face = "bold", size = 14),
+    strip.text = element_text(face = "bold"))
+
+map_smid_interactive <- ggplotly(map_smid, tooltip = "text")
+
+map_smid_interactive
+
+# Bivariate map
+library(cowplot)
+biv_bins <- analysis_geo_antidepr %>% 
+  mutate(prescr_bin = ntile(av_items_per_1000,3),
+         smid_bin = ntile(SMID_rank, 3),
+         biv_class = paste0(prescr_bin, "-", smid_bin))
+
+biv_palette <- c(
+  "1-1" = "#e8e8e8",
+  "2-1" = "#b8d6be",
+  "3-1" = "#64acbe",
+  "1-2" = "#d4b9da",
+  "2-2" = "#a5add3",
+  "3-2" = "#4a7bb7",
+  "1-3" = "#c994c7",
+  "2-3" = "#df65b0",
+  "3-3" = "#dd1c77")
+
+biv_matrix <- expand.grid(prescr_bin = 1:3, smid_bin = 1:3) %>% 
+  mutate(smid_bin = 4 - smid_bin, biv_class = paste0(prescr_bin, "-", smid_bin))
+
+biv_legend <- biv_matrix %>% 
+  ggplot(aes(x = prescr_bin, y = smid_bin, fill = biv_class)) +
+  geom_tile(color = "white") +
+  scale_fill_manual(values = biv_palette, guide = "none") +
+  scale_y_continuous(breaks = 1:3, labels = c("Low", "", "High")) +
+  scale_x_continuous(breaks = 1:3, labels = c("Low", "", "High")) +
+  labs(
+    x = "Prescriptions",
+    y = "SMID Rank") +
+  coord_fixed(ratio = 1)+
+  theme_minimal(base_size = 9) +
+  theme_void()+
+  theme(
+    axis.title = element_text(size = 8, face = "bold"),
+    axis.text = element_text(size = 6),
+    panel.grid = element_blank(),
+    plot.margin = margin(t = 0, r = 5, b = 0, l = 0))
+
+map_biv <- biv_bins %>% 
+  ggplot() +
+  geom_sf(aes(fill = biv_class), size = 0.1, colour = "white") +
+  scale_fill_manual(values = biv_palette, guide = "none") +
+  facet_wrap(~season, nrow = 1) +
+  labs(
+    title = "Bivariate Map showing Antidepressant prescription and SMID ranking",
+    subtitle = "Prescriptions per 1000 people across Scottish NHS Healthboard",
+    fill = "Bivariate classification") +
+  coord_sf(expand = FALSE) +
+  theme_void()+
+  theme(
+    plot.title = element_text(face = "bold", size = 14),
+    plot.subtitle = element_text(size = 10),
+    panel.spacing = unit(0.1, "lines"),
+    strip.text = element_text(face = "bold", size = 8),
+    plot.margin = margin(t = 0, r = 10, b = 0, l = 10, unit = "pt"))
+  
+final_map_biv <- plot_grid(map_biv, biv_legend,
+                           ncol = 2,
+                           rel_widths = c(4, 1),
+                           align = "t")
+final_map_biv
+
+# Interactive scatter plot
+smid_daylight_scatter <-plot_ly(
+  data = analysis_antidepr_smid,
+  x = ~SMID_rank,
+  y = ~av_items_per_1000,
+  color = ~hb_name,
+  text = ~paste0(
+    "<b>NHS Board:</b> ", hb_name, "<br>",
+    "<b>Season:</b> ", season, "<br>",
+    "<b>Prescriptions per 1000:</b> ",
+    round(av_items_per_1000, 1), "<br>",
+    "<b>SMID Rank:</b> ", SMID_rank),
+  hoverinfo = "text",
+  type = "scatter",
+  mode = "markers",
+  marker = list(size = 10, opacity = 0.8)) %>% 
+  layout(
+    title = list(text = "Seasonal Antidepressant Prescriptions and Health Board Deprivation rankings<sup><br> Prescriptions per 1000 people</sup>", x = 0.5, xanchor = "center"),
+    xaxis = list(title = "SMID Rank (Higher = Less Deprived)"),
+    yaxis = list(title = "Antidepressant Prescriptions (unit/per 1000)"),
+    margin = list(t = 90, r = 100, b = 85, l = 85))
+
+smid_daylight_scatter
+
 ```
 

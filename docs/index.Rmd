@@ -549,38 +549,40 @@ This is a promising scope of study, hence, future research must be done to tackl
 
 # References
 
+
 # Appendix
-
-## Appendix 1.2. Season Categorisation as per Met Office UK Guidelines
-
-**Spring**: March, April, May\
-**Summer**: June, July, August\
-**Autumn**: September, October, November\
-**Winter**: December, January, February\
-
-## Appendix 1.3. NHS Health Board Geographical Categorisation
-
-This categorisation was made according to the Met Office's territorial delineation of Scotland based on the distribution of climate measurements as available in their website.
-
-**Northern Scotland**: NHS Highland, NHS Western Isles, NHS Orkney, NHS Shetland\
-**Eastern Scotland**: NHS Borders, NHS Lothian, NHS Fife, NHS Tayside, NHS Grampian, NHS Forth Valley\
-**Western Scotland**: NHS Ayrshire and Arran, NHS Dumfries and Galloway, NHS Greater Glasgow and Clyde, NHS Lanarkshire
-
-## Appendix 1.3. Met Office Seasonal Data (TXT files)
-
-*Northern Scotland:*\
-<https://www.metoffice.gov.uk/pub/data/weather/uk/climate/datasets/Sunshine/ranked/Scotland_N.txt>\
-
-*Eastern Scotland:*\
-<https://www.metoffice.gov.uk/pub/data/weather/uk/climate/datasets/Sunshine/ranked/Scotland_E.txt>
-
-*Western Scotland:*\
-<https://www.metoffice.gov.uk/pub/data/weather/uk/climate/datasets/Sunshine/ranked/Scotland_W.txt>
-
-## Appendix 1.4. Figure 5
-
+## Appendix 1.1 - 1.3
 ```{r}
-# Interactive scatter plot
+
+# Appendix 1.1. Season Categorisation as per Met Office UK Guidelines
+# **Spring**: March, April, May\
+# **Summer**: June, July, August\
+# **Autumn**: September, October, November\
+# **Winter**: December, January, February\
+
+
+# Appendix 1.2. NHS Health Board Geographical Categorisation
+#This categorisation was made according to the Met Office's territorial delineation of Scotland based on the distribution of climate measurements as available in their website.
+
+# **Northern Scotland**: NHS Highland, NHS Western Isles, NHS Orkney, NHS Shetland\
+# **Eastern Scotland**: NHS Borders, NHS Lothian, NHS Fife, NHS Tayside, NHS Grampian, NHS Forth Valley\
+# **Western Scotland**: NHS Ayrshire and Arran, NHS Dumfries and Galloway, NHS Greater Glasgow and Clyde, NHS Lanarkshire
+
+
+# Appendix 1.3. Met Office Seasonal Data (TXT files)
+#*Northern Scotland:*\
+# <https://www.metoffice.gov.uk/pub/data/weather/uk/climate/datasets/Sunshine/ranked/Scotland_N.txt>\
+
+#*Eastern Scotland:*\
+# <https://www.metoffice.gov.uk/pub/data/weather/uk/climate/datasets/Sunshine/ranked/Scotland_E.txt>
+
+#*Western Scotland:*\
+# <https://www.metoffice.gov.uk/pub/data/weather/uk/climate/datasets/Sunshine/ranked/Scotland_W.txt>
+
+```
+
+## Appendix 1.4. Figure 5 - Interactive scatter plot
+```{r}
 scatter_plot_data <- analysis_geo_prescr %>%
   st_drop_geometry() %>% 
   filter(!is.na(SMID_median_rank), !is.na(av_items_per_1000))
@@ -619,3 +621,4 @@ scatter_plot <- plot_ly(
   
   scatter_plot
 ```
+

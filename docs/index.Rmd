@@ -96,7 +96,7 @@ library(ggtext)
 library(patchwork)
 library(plotly)
 library(cowplot)
-
+library(stringr)
 ```
 
 1.2 Load all the Health Board Data (January 2024:June 2025) into RStudio and use the `janitor` package by using the `clean_names()` function to have uniform names throughout datasets
@@ -370,36 +370,50 @@ This table shows the mean seasonal total daylight hours and the mean antidepress
 3.1. Bar chart graph showing standardised antidepressant prescription rates proportional to NHS Health Board population and average daylight hours per month from March 2024 to March 2025, faceted by Scottish Geographical Region (North, East, and West).
 
 ```{r}
-composite_analysis <- analysis_prescr_smid %>% 
+dual_bar_analysis <- analysis_prescr_smid %>% 
   group_by(region, season) %>% 
   summarise(av_items_per_1000 = mean(items_per_1000, na.rm = TRUE), av_daylight = mean(daylight_hrs, na.rm = TRUE)) %>% 
   ungroup() %>% 
-  mutate(season = factor(season, levels = c("Spring", "Summer", "Autumn", "Winter")))
+  mutate(season = factor(season, levels = c("Spring", "Summer", "Autumn", "Winter"))) %>% 
+  pivot_longer(cols = c(av_daylight, av_items_per_1000),
+               names_to = "variable",
+               values_to = "value")
 
-composite_plot <- composite_analysis %>% 
-ggplot(aes(x = season)) +
-  geom_col(aes(y = av_daylight), fill = "skyblue", alpha = 0.6) +
-  geom_col(aes(y = av_items_per_1000), fill = "darkred", alpha = 0.6) +
+# Making a ggplot with double bars
+dual_bar_plot <- dual_bar_analysis %>% 
+  ggplot(aes(x = season, y = value, fill = variable, text = ifelse(
+    variable == "av_daylight",
+    paste0("Daylight (hrs): ", round(value, 2)),
+    paste0("Prescriptions: ", round(value, 2))))) +
+  geom_col(position = position_dodge(width = 0.9), alpha = 0.8) +
   facet_wrap(~region, nrow = 1, scales = "free_x") +
   scale_y_continuous(
-    name = "Average Total Daylight (hrs)",
-    sec.axis = sec_axis(~ ., name = "Average Antidepressant Prescriptions (units/1000 people)")) +
+    name = str_wrap("Average Total Daylight (hrs)", width = 30),
+    breaks = seq(0, max(dual_bar_analysis$value), 50),
+    sec.axis = sec_axis(~ ., name = str_wrap("Average Antidepressant Prescriptions (units/1000 people)", width = 35), breaks = seq(0, max(dual_bar_analysis$value), 50))) +
+  scale_fill_manual(values = c("orange", "skyblue"), 
+                    labels = c("Daylight (hrs)", "Prescriptions (units/1000)")) +
   labs(
-    title = "Average seasonal total daylight hours and average antidepressant prescription items by region",
-    subtitle = "Prescriptions to daylight axis for visual",
+    title = str_wrap("Average seasonal total daylight hours and average antidepressant prescription items by region", width = 63),
+    subtitle = "Prescriptions per 1000 people across Scottish Health Boards",
     x = "Season",
-    y = "Average Total Daylight (hrs)") +
+    fill = "") +
   theme_minimal(base_size = 13) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1),
     legend.position = "top",
     legend.title = element_blank(),
+    legend.text = element_text(size = 10),
     strip.background = element_rect(fill = "gray90", color = NA),
     strip.text = element_text(face = "bold", size = 12),
-    plot.title = element_text(face = "bold", size = 12),
-    plot.margin = margin(t = 20, r = 10, b = 20, l = 10, unit = "pt"))
- 
+    plot.title = element_text(face = "bold", size = 16, margin = margin(b = 5), hjust = 0.3),
+    plot.title.position = "panel",
+    plot.subtitle = element_text(face = "bold", size = 12, margin = margin(b = 10), hjust = 0.5),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor = element_blank(),
+    plot.margin = margin(t = 20, r = 10, b = 40, l = 10, unit = "pt"))
 
-composite_plot
+dual_bar_plot
+
 
 ```
 
@@ -417,8 +431,8 @@ map_prescr_seasons <- analysis_geo_prescr %>%
    labs(title = "Seasonal Antidepressant Prescriptions (March 2024 - February 2025)", subtitle = "Prescriptions by Scottish Health Board per 1000 people comparable with Average Total Daylight (hrs)", fill = "units/1000 people") +
   theme_void() +
   theme(
-    plot.title = element_text(face = "bold", size = 10),
-    plot.subtitle = element_text(size = 9), 
+    plot.title = element_text(face = "bold", size = 10, hjust = 0.5),
+    plot.subtitle = element_text(size = 9, margin = margin(t = 10, b = 20), hjust = 0.5), 
     legend.title = element_text(face = "bold", size = 10))
 
 map_daylight_seasons <- analysis_geo_prescr %>% 
@@ -463,7 +477,7 @@ biv_palette <- c(
 
 # bivariate map bin matrix
 biv_matrix <- expand.grid(prescr_bin = 1:3, smid_bin = 1:3) %>% 
-  mutate(smid_bin = 4 - smid_bin, biv_class = paste0(prescr_bin, "-", smid_bin))
+  mutate(smid_bin = smid_bin, biv_class = paste0(prescr_bin, "-", smid_bin))
 
 # bivariate map legend
 biv_legend <- biv_matrix %>% 
@@ -491,14 +505,15 @@ map_biv_solo <- biv_bins %>%
   scale_fill_manual(values = biv_palette, guide = "none") +
   facet_wrap(~season, nrow = 1) +
   labs(
-    title = "Seasonal Antidepressant prescriptions comparison with Median Deprivation rankings",
-    subtitle = "Prescriptions per 1000 people across Scottish NHS Healthboard | Scottish Multiple Index of Deprivation (SMID) Rank",
+    title = str_wrap("Seasonal Antidepressant prescriptions comparison with Median Deprivation Rankings"),
+    subtitle = str_wrap("Prescriptions per 1000 people across Scottish NHS Health Boards | Scottish Multiple Index of Deprivation (SMID) Rank"),
     fill = "Bivariate classification") +
   coord_sf(expand = FALSE) +
   theme_void()+
   theme(
-    plot.title = element_text(face = "bold", size = 14),
-    plot.subtitle = element_text(size = 10),
+    plot.title = element_text(face = "bold", size = 14, margin = margin(r = 0.5, b = 0.5), hjust = 0.5),
+    plot.title.position = "panel",
+    plot.subtitle = element_text(size = 10, margin = margin(t = 10, b = 20), hjust = 1),
     panel.spacing = unit(0.1, "lines"),
     strip.text = element_text(face = "bold", size = 8),
     plot.margin = margin(t = 0, r = 10, b = 0, l = 10, unit = "pt"))
@@ -587,6 +602,19 @@ scatter_plot <- plot_ly(
     hoverinfo = "text",
     marker = list(size = 10, opacity = 0.8)) %>%
     layout(
+      title = list(text = "Antidepressant Prescriptions according to Median Deprivation Ranks",
+                   font = list(size = 14),
+                   x = 0.5),
+      annotations = list(list(
+        x = 0.5,
+        y = 1.05,
+        text = "Prescriptions per 1000 people across Scottish NHS Health Boards | Scottish Multiple Index of Deprivation (SMID) Rank",
+        xref = "paper",
+        yref = "paper",
+        showarrow = FALSE,
+        font = list(size = 10),
+        xanchor = "center",
+        yanchor = "bottom")),
       xaxis = list(title = "SMID Rank (Higher = Less Deprived)"),
       yaxis = list(title = "Antidepressant Prescriptions (units/1000)"),
       margin = list (t = 90, r = 100, b = 85, l = 85))

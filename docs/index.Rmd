@@ -1,50 +1,42 @@
 ---
 title: "Seasonal depression and Antidepressant Prescriptions in Scotland"
-output: html_document
+output: 
+  html_document: 
+    toc: true
+    toc_depth: 2
+    toc_float: true
+    code_folding: hide
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-
+knitr::opts_chunk$set(
+  echo = TRUE,
+  warning = FALSE,
+  message = FALSE,
+  fig.width = 8,
+  fig.height = 5)
 ```
 
 # Brrr: Cold, short and sad winter days
 
-Coming from Peru to Scotland was not only a cultural shock but an environmental one, if you will. I had never experienced such strikingly beautiful but equally emotionally debilitating winters. In Scotland, daylight is precious despite its scarcity in Scottish winters. Here is when I first heard the term 'Seasonal depression' being used the most at this time of the year, between the end of Autumn and the cusp of Winter; whereas it's a passing comment from a friend, a sitcom joke, or a genuine Google search during those long, dark, and cold winter days when you feel extra homesick.\
-Throughout my time in Scotland I have wondered if seasonal depression is more a myth than a reality but have never quite gathered more than qualitative data in the form of conversations with friends and acquaintances. Therefore, I have decided to quantify these verbal leads through this report.
+Coming from Peru to Scotland was not only a cultural shock but an environmental one, if you will. I had never experienced such strikingly beautiful but equally emotionally debilitating winters. Here is when I first heard the term 'Seasonal Depression' being thrown around at this time of the year, between the end of Autumn and the cusp of Winter. Whereas it's a passing comment from a friend, a sitcom joke, or a genuine Google search during those short, dark, and cold winter days, 'Seasonal Depression', or medically classified as Seasonal Affective Disorder (SAD), has affected almost everyone I know here.\
+Therefore, this investigation seeks to quantify the verbal leads I have stumbled upon for years during conversations with friends and acquaintances.
+
+## Seasonal Affective Disorder (SAD)
+
+SAD is widely discussed in literature, with a focus in populations living at high latitudes such as Denmark, Sweden and Iceland (REFERENCE et al., DATE). Mainland Scotland regionally situates itself on par with the southernmost areas of Scandinavian countries, with Edinburgh and Copenhagen being latitudinal buddies. However, the Scottish Isles (i.e, Orkney, Shetland, etc) are further north and are roughly comparable in latitude to Norwegian cities such as Bergen and Oslo. Hence, making the nature of this investigation as interesting as it close to my personal interests.
 
 # Investigation breakdown
 
-The research question to be explored is:
+This report focuses on investigating whether antidepressant medication prescribing in Scotland shows seasonal patterns and whether those patterns are related to regional daylight exposure and deprivation levels.\
 
-> To what extent do seasonal variations relating to daylight hours and temperature affect antidepressant prescribing rates across Scottish NHS Health Boards?
+The research question to be explored asks:
 
-## Variables
+> To what extent do seasonal variations in daylight hours affect antidepressant medication prescribing across Scottish NHS Health Boards?
 
-The data time frame to be used is from March 2024 to March 2025 to assess the potential cyclical nature of results and make adequate comparisons between seasons.
+For this investigation, prescription data is taken as a direct inferential measure of the population-level mental health burden.
 
-### Season Categorisation
-
-**Spring**: March, April, May\
-**Summer**: June, July, August\
-**Autumn**: September, October, November\
-**Winter**: December, January, February\
-
-### NHS Health Board Geographical Categorisation
-
-This categorisation has been made according to the Met Office's territorial delineation of Scotland based on the distribution of climate measurements as available in their website.
-
-**Northern Scotland**: NHS Highland, NHS Western Isles, NHS Orkney, NHS Shetland\
-**Eastern Scotland**: NHS Borders, NHS Lothian, NHS Fife, NHS Tayside, NHS Grampian, NHS Forth Valley\
-**Western Scotland**: NHS Ayrshire and Arran, NHS Dumfries and Galloway, NHS Greater Glasgow and Clyde, NHS Lanarkshire
-
-### Antidepressant Prescriptions
-
-Raw data from multiple institutional websites include all medications prescribed by NHS Health Boards. To differentiate and include only Antidepressant prescriptions, only prescriptions with a BNF item code starting with **'0403'** will be used.
-
-This report aims to be a multi-factorial exploration of the environmental and social dimensions of antidepressant prescription rates in Scotland given that it's analysis will focus on three distinct aspects as shown in the hypotheses.
-
-## Hypotheses
+# Hypotheses
 
 This report puts forward an overarching hypothesis:
 
@@ -62,43 +54,33 @@ In the assumption that *H~a~* is true, this report proposed two further sub-hypo
 
 > > **II.** Areas with a higher socioeconomic deprivation index (SMID) will have a consistently higher benchmark antidepressant use regardless of season, making the impact of varying daylight hours and temperature be even greater.
 
-# Introduction to Data
+Thus, the report tests whether: a) antidepressant prescriptions are higher in autumn/winter than in spring/summer, b) geographic latitude/region affects seasonal patterns, and c) more deprived areas show higher baseline antidepressant prescribing.
 
-## Health Board Data
+## Variables
 
-January to June 2024: <https://www.opendata.nhs.scot/dataset/84393984-14e9-4b0d-a797-b288db64d088/resource/f0df380b-3f9b-4536-bb87-569e189b727a/download/hb_pitc2024_01_06-1.csv>\
+Variables were regionally and seasonally categorised according to Met Office UK guidelines. For information on specific categorisation see Appendix 1.1 and 1.2.
 
-July to December 2024: <https://www.opendata.nhs.scot/dataset/84393984-14e9-4b0d-a797-b288db64d088/resource/f3b9f2e2-66c0-4310-9b8e-734781d2ed0a/download/hb_pitc2024_07_12-1.csv>\
+## Antidepressant Prescriptions
 
-January to June 2025: <https://www.opendata.nhs.scot/dataset/84393984-14e9-4b0d-a797-b288db64d088/resource/9de908b3-9c28-4cc3-aa32-72350a0579d1/download/hb_pitc2025_01_06.csv>
+Raw data from multiple institutional websites include all medications prescribed by NHS Health Boards. To differentiate and include only Antidepressant prescriptions, only prescriptions with a BNF item code starting with **'0403'** were used.
 
-## Met Office Seasonal Data
+This report is a multi-factorial exploration of the environmental and social dimensions of antidepressant prescription rates in Scotland given that it's analysis focuses on three distinct aspects as shown below.
 
-North Scotland:\
-Daylight hrs - <https://www.metoffice.gov.uk/pub/data/weather/uk/climate/datasets/Sunshine/ranked/Scotland_N.txt>\
-Temperature - <https://www.metoffice.gov.uk/pub/data/weather/uk/climate/datasets/Tmean/date/Scotland_N.txt>\
+# Datasets Used
 
-East Scotland:\
-Daylight hrs - <https://www.metoffice.gov.uk/pub/data/weather/uk/climate/datasets/Sunshine/ranked/Scotland_E.txt>\
-Temperature - <https://www.metoffice.gov.uk/pub/data/weather/uk/climate/datasets/Tmean/date/Scotland_E.txt>\
+The investigation window used is from March 2024 to February 2025 (inclusive of March 1st, 2024 - February 28th, 2025) to assess the potential cyclical nature of results and make adequate comparisons between seasons.\
+All links mentioned below are included in the code within Methodology.
 
-West Scotland:\
-Daylight hrs - <https://www.metoffice.gov.uk/pub/data/weather/uk/climate/datasets/Sunshine/ranked/Scotland_W.txt>\
-Temperature - <https://www.metoffice.gov.uk/pub/data/weather/uk/climate/datasets/Tmean/date/Scotland_W.txt>\
+## Datasets
 
-## Scottish Index of Multiple Deprivation (SMID quintiles) Data
-
-Taken from the Public Health Scotland website:\
-<https://www.opendata.nhs.scot/dataset/78d41fa9-1a62-4f7b-9edb-3e8522a93378/resource/acade396-8430-4b34-895a-b3e757fa346e/download/simd2020v2_22062020.csv>
-
-## NHS Health Board Total Population Data
-
-Also taken from the Public Health Scotland website:\
-<https://www.opendata.nhs.scot/dataset/e3300e98-cdd2-4f4e-a24e-06ee14fcc66c/resource/cec9341e-ccba-4c71-afe4-a614f5e97b9f/download/practice_listsizes_oct2024-open-data.csv>
+-   Public Health Scotland - Prescription Data: "Prescriptions in the Community (by Health Board)" for Jan 2024 - Jun 2025 (subset to fit investigation window).
+-   Public Health Scotland - Population Data: "Health Board Population" from October 2024. Used for data standardisation (population-weighting).
+-   Met Office Data: "Monthly, seasonal and annual total duration of bright sunshine for Scotland" per region (North, East, West). Converted from TXT to CSV files and stored in `docs/data`. See original TXT files in Appendix 1.3.
+-   Public Health Scotland - Deprivation: "Scottish Index of Multiple Deprivation (SMID 2020)" for all GP practices and Health Boards.
 
 # Methodology
 
-## 1. Data Wrangling and Merging
+## 1. Data Loading and Wrangling
 
 1.1 Load all the required libraries on RStudio
 
@@ -106,52 +88,61 @@ Also taken from the Public Health Scotland website:\
 library(tidyverse)
 library(here) # for the upkeep of the directory structure
 library(janitor) # for data cleaning
+library(lubridate)
 library(gt) # for table building
+library(sf) # for geospatial visualisation
+library(ggplot2)
+library(ggtext)
+library(patchwork)
+library(plotly)
+library(cowplot)
 
 ```
 
 1.2 Load all the Health Board Data (January 2024:June 2025) into RStudio and use the `janitor` package by using the `clean_names()` function to have uniform names throughout datasets
 
 ```{r}
-prescr_jan_june_2024 <- read_csv("https://www.opendata.nhs.scot/dataset/84393984-14e9-4b0d-a797-b288db64d088/resource/f0df380b-3f9b-4536-bb87-569e189b727a/download/hb_pitc2024_01_06-1.csv") %>% 
-  clean_names()
+urls_prescr <- list(
+  prescr_jan_june_2024 <- "https://www.opendata.nhs.scot/dataset/84393984-14e9-4b0d-a797-b288db64d088/resource/f0df380b-3f9b-4536-bb87-569e189b727a/download/hb_pitc2024_01_06-1.csv",
+  prescr_july_dec_2024 <- "https://www.opendata.nhs.scot/dataset/84393984-14e9-4b0d-a797-b288db64d088/resource/f3b9f2e2-66c0-4310-9b8e-734781d2ed0a/download/hb_pitc2024_07_12-1.csv",
+  prescr_jan_june_2025 <- "https://www.opendata.nhs.scot/dataset/84393984-14e9-4b0d-a797-b288db64d088/resource/9de908b3-9c28-4cc3-aa32-72350a0579d1/download/hb_pitc2025_01_06.csv")
 
-prescr_july_dec_2024 <- read_csv("https://www.opendata.nhs.scot/dataset/84393984-14e9-4b0d-a797-b288db64d088/resource/f3b9f2e2-66c0-4310-9b8e-734781d2ed0a/download/hb_pitc2024_07_12-1.csv") %>% 
-  clean_names()
+# reads all Health Board prescription data in a loop to avoid repetition
+prescr_list <- map(urls_prescr,
+                   ~read_csv(.x) %>%
+                     clean_names())
 
-prescr_jan_june_2025 <- read_csv("https://www.opendata.nhs.scot/dataset/84393984-14e9-4b0d-a797-b288db64d088/resource/9de908b3-9c28-4cc3-aa32-72350a0579d1/download/hb_pitc2025_01_06.csv") %>% 
-  clean_names()
+# binds together everything in a single tibble
+prescr_raw <- bind_rows(prescr_list, .id = "source_file") %>% 
+  mutate(paid_date_month = str_trim(as.character(paid_date_month))) %>% 
+  select(-source_file)
+
+glimpse(prescr_raw)
 
 ```
 
-1.3 Now filter out by "bnf_item_code" to keep only those prescriptions that are antidepressants (codes starting with '0403') and that were prescribed within our selected time frame (March 2024 - March 2025). Make sure to maintain the following: hbt, bnf_item_description, number_of_paid_items, and paid_date_month. Repeat for all Health Board datasets.
+1.3 Now filter out by "bnf_item_code" to keep only those prescriptions that are antidepressants (codes starting with '0403') and that were prescribed within our selected time frame (March 2024 - February 2025). Make sure to maintain the following: hbt, bnf_item_description, number_of_paid_items, and paid_date_month. Repeat for all Health Board datasets.
 
 ```{r}
-antidepr_march_june_2024 <- prescr_jan_june_2024 %>% 
+# only keeping antidepressant codes and aggregating prescriptions per HB per month
+prescr_monthly <- prescr_raw %>%
+  filter(!is.na(bnf_item_code)) %>% 
   filter(str_detect(bnf_item_code, "^0403")) %>%
-  filter(paid_date_month != "202401" & paid_date_month != "202402") %>%
-  select(c(hbt,bnf_item_code,bnf_item_description,number_of_paid_items,paid_date_month)) %>% 
+  mutate(paid_date_month = as.integer(paid_date_month)) %>% 
   group_by(hbt, paid_date_month) %>%
   summarise(number_of_items = sum(number_of_paid_items, na.rm = TRUE)) %>% 
   arrange(paid_date_month)
+  
+# subsetting to fit our investigation window 
+prescr_monthly <- prescr_monthly %>% 
+  filter(paid_date_month >= 202403, paid_date_month <= 202502)
 
-antidepr_july_dec_2024 <- prescr_july_dec_2024 %>% 
-  filter(str_detect(bnf_item_code, "^0403")) %>%
-  select(c(hbt,bnf_item_code,bnf_item_description,number_of_paid_items,paid_date_month)) %>% 
-  group_by(hbt, paid_date_month) %>%
-  summarise(number_of_items = sum(number_of_paid_items, na.rm = TRUE)) %>% 
-  arrange(paid_date_month)
+prescr_monthly %>% 
+  summarise(rows = n(), min_month = min(paid_date_month), max_month = max(paid_date_month))
 
-antidepr_jan_feb_2025 <- prescr_jan_june_2025 %>% 
-  filter(str_detect(bnf_item_code, "^0403")) %>%
-  filter(paid_date_month != "202503" & paid_date_month != "202504" & paid_date_month != "202505" & paid_date_month != "202506") %>%
-  select(c(hbt,bnf_item_code,bnf_item_description,number_of_paid_items,paid_date_month)) %>% 
-  group_by(hbt, paid_date_month) %>%
-  summarise(number_of_items = sum(number_of_paid_items, na.rm = TRUE)) %>% 
-  arrange(paid_date_month)
 ```
 
-1.4 Join the three antidepressant datasets to create a unified March 2024-March 2025 prescription data object. Then, create an object for seasonal categorisations and merge it with the unified object created.
+1.4 Create an object for seasonal categorisations
 
 ```{r}
 spr_months_202425 <- c(202403, 202404, 202405)
@@ -160,392 +151,305 @@ aut_months_202425 <- c(202409, 202410, 202411)
 win_months_202425 <- c(202412, 202501, 202502)
 
 seasons_202425 <- tibble(
-  month = c(spr_months_202425, sum_months_202425, aut_months_202425, win_months_202425),
-  season = c(rep("spr", length(spr_months_202425)),
-             rep("sum", length(sum_months_202425)),
-             rep("aut", length(aut_months_202425)),
-             rep("win", length(win_months_202425))))
+  paid_date_month = c(spr_months_202425, sum_months_202425, aut_months_202425, win_months_202425),
+  season = c(rep("Spring", length(spr_months_202425)),
+             rep("Summer", length(sum_months_202425)),
+             rep("Autumn", length(aut_months_202425)),
+             rep("Winter", length(win_months_202425))))
 
-yearly_antidepr_data <- antidepr_march_june_2024 %>% 
-full_join(antidepr_july_dec_2024)
-
-yearly_antidepr_data <- yearly_antidepr_data %>% 
-  full_join(antidepr_jan_feb_2025) %>% 
-  full_join(seasons_202425, join_by(paid_date_month == month))
-  
 ```
 
-1.5 Create an object for geographical NHS Health Board names. Make each health board be geographically named to match Met Office data later on. Then, `full_join()` the dataset with the yearly_antidepr_data object created in the previous step.
+1.5 Create an object for all NHS Scottish Health Board names and another one for Met Office regional mapping. Make each health board be named and regionally categorised and `full_join()` these to create 'hb_regional'.
 
 ```{r}
+# Health Board official NHS names list
+hb_names <- read_csv("https://www.opendata.nhs.scot/dataset/9f942fdb-e59e-44f5-b534-d6e17229cc7b/resource/652ff726-e676-4a20-abda-435b98dd7bdc/download/hb14_hb19.csv") %>% 
+  clean_names()
+
+# Met Office regional mapping
 north_hb <- c("NHS Highland", "NHS Western Isles", "NHS Orkney", "NHS Shetland")
 east_hb <- c("NHS Borders", "NHS Lothian", "NHS Fife", "NHS Tayside", "NHS Grampian", "NHS Forth Valley")
 west_hb <- c("NHS Ayrshire and Arran", "NHS Dumfries and Galloway", "NHS Greater Glasgow and Clyde", "NHS Lanarkshire")
 
-
 metoffice_hb_region <- tibble(
   hb_name = c(north_hb, east_hb, west_hb),
-  region = c(rep("north", length(north_hb)),
-             rep("east", length(east_hb)),
-             rep("west", length(west_hb))))
+  region = c(rep("North", length(north_hb)),
+             rep("East", length(east_hb)),
+             rep("West", length(west_hb))))
 
-
-hb_names <- read_csv("https://www.opendata.nhs.scot/dataset/9f942fdb-e59e-44f5-b534-d6e17229cc7b/resource/652ff726-e676-4a20-abda-435b98dd7bdc/download/hb14_hb19.csv") %>% 
-  clean_names() %>% 
-  full_join(metoffice_hb_region)
-  
-
-hbt_antidepr_yearly <- yearly_antidepr_data %>% 
-  full_join(hb_names, join_by(hbt == hb)) %>% 
+# Health Boards per region according to Met Office scottish territorial classifications
+hb_regional <- hb_names %>% 
+  full_join(metoffice_hb_region, by = "hb_name") %>% 
   select(-c(hb_date_archived, hb_date_archived, hb_date_enacted, country))
 ```
 
-1.6 Notes at this stage:
+1.6 Load, wrangle and organise NHS Health Board population data from the data file from October 2024. The date chosen is deliberate as October 2024 marks approximately half-way through the determined time period that this investigation is focusing on.
 
--   After the `full_join()` there are 4 rows with NA in prescription data (paid_date_month and number_or_items). Upon further investigation and a look at the object hb_names, these were shown to have had their hbt numbers archived in 2018 and 2019, making them easily removable from our data.
+```{r}
+hb_pop <- read_csv("https://www.opendata.nhs.scot/dataset/e3300e98-cdd2-4f4e-a24e-06ee14fcc66c/resource/cec9341e-ccba-4c71-afe4-a614f5e97b9f/download/practice_listsizes_oct2024-open-data.csv") %>% 
+  clean_names() %>% 
+  select(hb, sex, all_ages) %>% 
+  filter(!sex %in% c("Male", "Female")) %>%
+  group_by(hb) %>% 
+  summarise(hb_population = sum(all_ages, na.rm = TRUE)) %>% 
+  ungroup()
+  
+```
+
+1.7 Join prescriptions, Health Board, population, season and regional categorisation to one dataset
+
+```{r}
+prescr_seasonal <- prescr_monthly %>% 
+  full_join(hb_regional %>% 
+              select(hb, hb_name, region), by = join_by(hbt == hb)) %>% 
+  full_join(hb_pop, by = join_by(hbt == hb)) %>% 
+  full_join(seasons_202425, by = join_by(paid_date_month))
+
+```
+
+1.8 Notes at this stage:
+
+-   After the `full_join()` there are 4 rows with NA in prescription data and population (paid_date_month, number_or_items, and hb_population). Upon further investigation and a look at the object hb_names, these were shown to have had their hbt numbers archived in 2018 and 2019, making them easily removable from our data.
 -   There is a row with hbt 'SB0806' which shows NA for hb_name though has antidepressant prescription data for December 2024 only. Given the value ('2') is extremely low and this hbt is not on record or appears any other time, it has been decided to be excluded from the analysis.
 
 ```{r}
-clean_hbt_antidepr_yearly <- hbt_antidepr_yearly %>% 
+prescr_seasonal <- prescr_seasonal %>% 
   filter(!is.na(hb_name)) %>% 
   filter(!is.na(paid_date_month))
+
+# checking if there is a missing region or population
+prescr_seasonal %>% 
+  filter(is.na(region) | is.na(hb_population)) # tibble of 0 x 7 shows we have eliminated all NAs
+
 ```
 
-1.7 Load, wrangle and organise NHS Health Board population data from the data file from October 2024. The date chosen is deliberate as October 2024 marks approximately half-way through the determined time period that this investigation is focusing on.
+1.9 For prescription data standardisation, a calculation of items_per_1000_people will be made. This is because all NHS Health Boards have different populations, thus, comparing their "number_of_items" solely would not provide correct conclusions.
 
 ```{r}
-hb_pop_oct_2024 <- read_csv("https://www.opendata.nhs.scot/dataset/e3300e98-cdd2-4f4e-a24e-06ee14fcc66c/resource/cec9341e-ccba-4c71-afe4-a614f5e97b9f/download/practice_listsizes_oct2024-open-data.csv") %>% 
-  clean_names()
-
-clean_hb_population <- hb_pop_oct_2024 %>%
-  select(hb, sex, all_ages) %>%
-  filter(!sex %in% c("Male", "Female")) %>% 
-  group_by(hb) %>% 
-  summarise(hb_population = sum(all_ages))
-```
-
-1.8 Introduce population data for each NHS health board.
-
-```{r}
-antidepr_yearly_hb_pop <- clean_hbt_antidepr_yearly %>% 
-  full_join(clean_hb_population, join_by(hbt == hb))
-```
-
-1.9 Now let's introduce the daylight hours data from the UK Met Office. Given the nature of the .txt files, I converted them into .csv files using Excel. These files can be found in the 'data' folder attached.
-
-```{r}
-daylight_north_scot <- read_table(here("docs","data", "R_north_scotland_sunshine.csv"))
-
-daylight_east_scot <- read_table(here("docs","data", "R_east_scotland_sunshine.csv"))
-
-daylight_west_scot <- read_table(here("docs","data","R_west_scotland_sunshine.csv"))
-```
-
-1.10 Upon inspection of the data, one can notice that there are specific columns for each season apart from one for each month. This report will be using the seasonal data to make the merging processes easier. Now, each daylight hours object will be cleaned and wrangled to only have March 2024-March 2025 data (March 1st 2024 to February 28th, 2025). The final object will be named all_seasons_daylight, which will contain all daylight hours per season per region for the March 2024-March 2025 analysis time period.
-
-```{r}
-# North of Scotland
-winter_daylight_north_2024_25 <- daylight_north_scot %>% 
-  select(win,year_12) %>% 
-  filter(year_12 == "2024") %>%  # December 2024, January 2025, and February 2025 are wanted
-  rename(year = year_12)
-
-spr_daylight_north_2024_25 <- daylight_north_scot %>% 
-  select(spr,year_13) %>% 
-  filter(year_13 == "2024") %>% # March 2024, April 2024, and May 2024 are wanted
-  rename(year = year_13)
-
-sum_daylight_north_2024_25 <- daylight_north_scot %>% 
-  select(sum,year_14) %>% 
-  filter(year_14 == "2024") %>%  # June 2024, July 2024, and August 2024 are wanted
-  rename(year = year_14)
-
-aut_daylight_north_2024_25 <- daylight_north_scot %>% 
-  select(aut,year_15) %>% 
-  filter(year_15 == "2024") %>% # September 2024, October 2024, and November 2024 are wanted
-  rename(year = year_15)
-
-season_daylight_north_complete <- winter_daylight_north_2024_25 %>% 
-  full_join(spr_daylight_north_2024_25, by = "year") %>% 
-  full_join(sum_daylight_north_2024_25, by = "year") %>% 
-  full_join(aut_daylight_north_2024_25, by = "year") %>% 
-  relocate(win, .after = aut) %>% 
-  mutate(across(spr:win, as.numeric)) %>% 
-  pivot_longer(cols = spr:win, names_to = "season", values_to = "daylight_hrs") %>% 
-  arrange(year, factor(season, levels = c("spr", "sum", "aut", "win"))) %>% 
-  mutate(region = "north") %>% 
-  filter(!is.na(daylight_hrs))
-
-# East of Scotland
-winter_daylight_east_2024_25 <- daylight_east_scot %>% 
-  select(win,year_12) %>% 
-  filter(year_12 == "2024") %>%  # December 2024, January 2025, and February 2025 are wanted
-  rename(year = year_12)
-
-spr_daylight_east_2024_25 <- daylight_east_scot %>% 
-  select(spr,year_13) %>% 
-  filter(year_13 == "2024") %>% # March 2024, April 2024, and May 2024 are wanted
-  rename(year = year_13)
-
-sum_daylight_east_2024_25 <- daylight_east_scot %>% 
-  select(sum,year_14) %>% 
-  filter(year_14 == "2024") %>%  # June 2024, July 2024, and August 2024 are wanted
-  rename(year = year_14)
-
-aut_daylight_east_2024_25 <- daylight_east_scot %>% 
-  select(aut,year_15) %>% 
-  filter(year_15 == "2024") %>% # September 2024, October 2024, and November 2024 are wanted
-  rename(year = year_15)
-
-season_daylight_east_complete <- winter_daylight_east_2024_25 %>% 
-  full_join(spr_daylight_east_2024_25, by = "year") %>% 
-  full_join(sum_daylight_east_2024_25, by = "year") %>% 
-  full_join(aut_daylight_east_2024_25, by = "year") %>% 
-  relocate(win, .after = aut) %>% 
-mutate(across(spr:win, as.numeric)) %>% 
-  pivot_longer(cols = spr:win, names_to = "season", values_to = "daylight_hrs") %>% 
-  arrange(year, factor(season, levels = c("spr", "sum", "aut", "win"))) %>% 
-  mutate(region = "east") %>% 
-  filter(!is.na(daylight_hrs))
-
-# West of Scotland
-winter_daylight_west_2024_25 <- daylight_west_scot %>% 
-  select(win,year_12) %>% 
-  filter(year_12 == "2024") %>%  # December 2024, January 2025, and February 2025 are wanted
-  rename(year = year_12)
-
-spr_daylight_west_2024_25 <- daylight_west_scot %>% 
-  select(spr,year_13) %>% 
-  filter(year_13 == "2024") %>% # March 2024, April 2024, and May 2024 are wanted
-  rename(year = year_13)
-
-sum_daylight_west_2024_25 <- daylight_west_scot %>% 
-  select(sum,year_14) %>% 
-  filter(year_14 == "2024") %>%  # June 2024, July 2024, and August 2024 are wanted
-  rename(year = year_14)
-
-aut_daylight_west_2024_25 <- daylight_west_scot %>% 
-  select(aut,year_15) %>% 
-  filter(year_15 == "2024") %>% # September 2024, October 2024, and November 2024 are wanted
-  rename(year = year_15)
-
-season_daylight_west_complete <- winter_daylight_west_2024_25 %>% 
-  full_join(spr_daylight_west_2024_25, by = "year") %>% 
-  full_join(sum_daylight_west_2024_25, by = "year") %>% 
-  full_join(aut_daylight_west_2024_25, by = "year") %>% 
-  relocate(win, .after = aut) %>% 
-  mutate(across(spr:win, as.numeric)) %>% 
-  pivot_longer(cols = spr:win, names_to = "season", values_to = "daylight_hrs") %>% 
-  arrange(year, factor(season, levels = c("spr", "sum", "aut", "win"))) %>% 
-  mutate(region = "west") %>% 
-  filter(!is.na(daylight_hrs))
-
-# Final 'season' object to be used for data merging with NHS Health Board prescription and population data
-all_seasons_daylight <- season_daylight_north_complete %>% 
-  full_join(season_daylight_east_complete) %>% 
-  full_join(season_daylight_west_complete)
-```
-
-1.11 Now daylight data will be inputted into the antidepr_yearly_hb_pop object as our final data merge, where categorisation of prescription data will follow seasonal categorisation (See Season Categorisation and NHS Health Board Geographical Categorisation).
-
-```{r}
-antidepr_season_hb_pop <- antidepr_yearly_hb_pop %>%
-  group_by(paid_date_month, region) %>% 
-  mutate(year = as.integer(substr(paid_date_month,1,4)),
-         month = as.integer(substr(paid_date_month, 5, 6)),
-         season = case_when(
-           month %in% 3:5  ~ "spr",
-           month %in% 6:8  ~ "sum",
-           month %in% 9:11 ~ "aut",
-           month %in% c(12,1,2) ~ "win"),
-         season_year = if_else(month %in% c(1, 2), year - 1, year)) %>%
-  full_join(all_seasons_daylight, by = c("season_year" = "year", "season", "region"))
-```
-
-## 2. Data Analysis
-
-2.1 For prescription data standardisation, a calculation of items_per_1000_people will be made. This is because all NHS Health Boards have different populations, thus, comparing their "number_of_items" solely would not provide correct conclusions.
-
-```{r}
-antidepr_season_hb_pop <- antidepr_season_hb_pop %>% 
+prescr_seasonal_standard <- prescr_seasonal %>%
   mutate(items_per_1000 = (number_of_items/hb_population)*1000)
 
 ```
 
-2.2. Now, let's introduce the Scottish Index of Multiple Deprivation (SMID quintiles) for each Health Board and create an analysis object called "analysis_antidepr_smid" for deprivation analysis.
-```{r}
-smid_hb <- read_csv("https://www.opendata.nhs.scot/dataset/78d41fa9-1a62-4f7b-9edb-3e8522a93378/resource/acade396-8430-4b34-895a-b3e757fa346e/download/simd2020v2_22062020.csv") %>% 
-  clean_names() %>% 
-  select(c(hb, simd2020v2rank)) %>% 
-  group_by(hb) %>% 
-  summarise(SMID_mean_rank = mean(simd2020v2rank))
-
-analysis_antidepr_smid <- antidepr_season_hb_pop %>%
-  full_join(smid_hb, join_by(hbt == hb)) %>% 
-  group_by(hbt, hb_name, season, season_year) %>% 
-  summarise(av_daylight_hrs = mean(daylight_hrs), av_items_per_1000 = mean(items_per_1000), SMID_rank = mean(SMID_mean_rank))
-
-```
-
-
-2.3. Clean data table to provide foundation for data visualisation and analysis for regional analysis.
+1.10 Introducing daylight hours data from the UK Met Office is somewhat challenging. Given the nature of the .txt files, I converted them into .csv files using Excel. These files can be found in the 'data' folder attached.\
+Upon inspection of the data, one can notice that there are specific columns for each season apart from one for each month. This report will be using seasonal data to make the merging processes easier. Building a function had to be done to avoid repeting the same wrangling for each region. \> Note: these .csv files contain columns named `spr`, `sum`, `aut`, `win` and a year column for each year and season
 
 ```{r}
+# Reading all CSV files first
+daylight_north <- read_table(here("docs", "data", "R_north_scotland_sunshine.csv")) %>%
+  clean_names()
 
-analysis_antidepr_season <- antidepr_season_hb_pop %>% 
-  group_by(region, season, paid_date_month) %>% 
-  summarise(av_daylight_hrs = mean(daylight_hrs), av_items_per_1000 = mean(items_per_1000)) %>% 
-  mutate(month = as.Date(paste0(paid_date_month, "01"), "%Y%m%d")) %>%
-  select(c(region, season, av_daylight_hrs, av_items_per_1000, month))
+daylight_east <- read_table(here("docs","data", "R_east_scotland_sunshine.csv")) %>% 
+  clean_names()
+
+daylight_west <- read_table(here("docs","data","R_west_scotland_sunshine.csv")) %>% 
+  clean_names()
+
+# Making a function to avoid code repetition for each .csv file
+daylight_season_function <- function(data, region_name, year_filter, season_cols = c("win", "spr", "sum", "aut"), year_cols = c("year_12", "year_13", "year_14", "year_15"), full_season_names = c("Winter", "Spring", "Summer", "Autumn")) {
+
+  # built-in checker
+  if(length(season_cols)!= length(year_cols)) stop("season_cols and year_cols need to have the same length")
+  if(length(season_cols)!= length(full_season_names)) stop("full_season_names and season_cols need to have the same length")
   
+  # processing each individual season
+  season_list <- map2(season_cols, year_cols, ~ {
+    data %>% 
+      select(all_of(.x), all_of(.y)) %>% 
+      filter(.data[[.y]] == year_filter) %>% 
+      rename(year = all_of(.y))
+  })
+  
+  # joining all four seasons together
+  season_complete <- reduce(season_list, full_join, by = "year") %>% 
+    relocate(all_of(season_cols), .after = last_col()) %>%
+    mutate(across(all_of(season_cols), as.numeric)) %>% 
+    pivot_longer(cols = all_of(season_cols), names_to = "season", values_to = "daylight_hrs") %>%
+    mutate(season = recode(season, !!!set_names(full_season_names, season_cols)),
+           region = region_name) %>% 
+    arrange(year, factor(season, levels = full_season_names)) %>%
+    filter(!is.na(daylight_hrs))
+  
+  return(season_complete)
+}
 
 
 ```
 
-2.4. Load and merge the Health Board shapefile with previous clean data sets. Wrangle and save for geospatial analysis.
+1.11 The function created was used for each regional daylight dataset. The final object will be named all_seasons_daylight, which will contain all daylight hours per season per region for the March 1st 2024 to February 28th, 2025 investigation window.
+
 ```{r}
-library(sf)
-NHS_hb_geo <- st_read(here("docs","data", "Week6_NHS_healthboards_2019.shp")) # for geospatial data viz
+# Using the function for each region and making sure the "year" category is a character
+season_daylight_north <- daylight_season_function(daylight_north, "North", "2024")
+season_daylight_north <- season_daylight_north %>% 
+  mutate(year = as.character(year))
 
-analysis_geo_antidepr <- NHS_hb_geo %>% 
-  full_join(analysis_antidepr_smid, by = join_by(HBCode == hbt)) %>% 
-  select(-c(season_year, HBName))
+season_daylight_east <- daylight_season_function(daylight_east, "East", "2024")
+season_daylight_east <- season_daylight_east %>% 
+  mutate(year = as.character(year))
+
+season_daylight_west <- daylight_season_function(daylight_west, "West", "2024")
+season_daylight_west <- season_daylight_west %>% 
+  mutate(year = as.character(year))
+
+# Merging all regional daylight data for each season
+all_seasons_daylight <- bind_rows(season_daylight_north, season_daylight_east, season_daylight_west)
+
+all_seasons_daylight
 
 ```
 
+1.12. Introducing the Scottish Index of Multiple Deprivation (SMID) rank for each Health Board and create an analysis object called "analysis_antidepr_smid" for deprivation analysis.
+
+```{r}
+# Median rank per Health Board was used to summarise the distribution of deprivation
+smid_raw <- read_csv("https://www.opendata.nhs.scot/dataset/78d41fa9-1a62-4f7b-9edb-3e8522a93378/resource/acade396-8430-4b34-895a-b3e757fa346e/download/simd2020v2_22062020.csv") %>% 
+  clean_names()
+
+smid_hb <- smid_raw %>% 
+  select(hb, simd2020v2rank) %>% 
+  group_by(hb) %>% 
+  summarise(SMID_median_rank = median(simd2020v2rank, na.rm = TRUE)) %>% 
+  ungroup()
+
+# Joining daylight, SMID and seasonal prescription data
+analysis_prescr_smid <- prescr_seasonal_standard %>%
+  full_join(all_seasons_daylight, by = join_by(season, region)) %>% 
+  full_join(smid_hb, by = join_by(hbt == hb))
+
+# Checking if any NAs are present
+analysis_prescr_smid %>% 
+  summarise(missing_daylight = sum(is.na(daylight_hrs)), missing_smid =  sum(is.na(SMID_median_rank))) # result should show a 14 x 3 tibble with value zero (0) for each
+```
+
+1.13. Load and merge the Health Board shapefile with previous clean data sets. Wrangle and save for geospatial analysis.
+
+```{r}
+hb_shp_geo <- st_read(here("docs","data", "Week6_NHS_healthboards_2019.shp")) %>% 
+  clean_names()
+
+analysis_geo_prescr <- analysis_prescr_smid %>% 
+  group_by(hbt, season, SMID_median_rank) %>% 
+  summarise(av_items_per_1000 = mean(items_per_1000, na.rm = TRUE), av_daylight = mean(daylight_hrs)) %>% 
+  ungroup() %>% 
+  full_join(hb_shp_geo, by = join_by(hbt == hb_code)) %>% 
+  st_as_sf()
+
+```
+
+## 2. Data Analysis - Results
+
+2.1. A seasonal summary table by region using `gt()`
+
+```{r}
+full_seasonal_table <- analysis_prescr_smid %>% 
+  group_by(region, season) %>% 
+  summarise(av_daylight = mean(daylight_hrs, na.rm = TRUE), av_items_per_1000 = mean(items_per_1000, na.rm = TRUE)) %>%
+  ungroup() %>% 
+  arrange(region, factor(season, levels = c("Spring", "Summer", "Autumn", "Winter")))
+
+full_seasonal_table %>%
+  mutate(av_items_per_1000 = round(av_items_per_1000, 2),
+         av_daylight = round(av_daylight, 2)) %>% 
+  gt(groupname_col = "region") %>% 
+  cols_label(
+    season = md("Season"),
+    av_daylight = md("Mean Total Daylight (hrs)"),
+    av_items_per_1000 = md("Mean Prescriptions (units/1000 people)")) %>% 
+  tab_header(
+    title = md("Antidepressant Prescriptions per 1000 and Total Daylight hours by region"),
+    subtitle = "March 1st, 2024 - February 28th, 2025") %>% 
+  fmt_number(columns = c(av_items_per_1000, av_daylight), decimals = 2)
+    
+```
+
+This table shows the mean seasonal total daylight hours and the mean antidepressant prescriptions per 1000 population for each region. This is the numeric anchor for the following data visualisations: a) regional composite seasonal plot b) seasonal heat map c) deprivation vs prescribing scatter plot
 
 ## 3. Data Visualisation
 
-3.1. Overall trends in antidepressant prescriptions and total daylight hours
-```{r}
-library(plotly)
-
-total_daylight_analysis <- analysis_antidepr_season %>% 
-  group_by(season, month) %>% 
-  summarise(mean_presc = mean(av_items_per_1000), mean_daylight = mean(av_daylight_hrs)) %>% 
-  ungroup()
-
-general_analysis_line <- total_daylight_analysis %>%
-  arrange(month) %>% 
-  plot_ly() %>%
-  add_segments(
-    x = ~month[season != lag(season, default = first(season))],
-    xend = ~month[season != lag(season, default = first(season))],
-    y = 0,
-    yend = max(total_daylight_analysis$mean_daylight),
-    line = list(color = "gray", dash = "dash"),
-    showlegend = FALSE) %>%
-  add_lines(
-    x = ~month, y = ~mean_daylight,
-            name = "Daylight Hours", line = list(color = "moccasin")) %>%
-  add_lines(
-    x = ~month, y = ~mean_presc,
-            name = "Items per 1000", yaxis = "y2", line = list(color = "blue")) %>%
-  layout(
-    title = "Daylight Hours and Antidepressant Prescriptions in Scotland",
-    yaxis = list(title = "Daylight Hours"),
-    yaxis2 = list(title = "Items per 1,000", overlaying = "y", side = "right"),
-    xaxis = list(
-      title = "Month",
-      type = "date",
-      tickmode = "linear",
-      dtick = "M1",
-      tickangle = -45))
-
-general_analysis_line
-
-```
-
-
-3.2 Composite graph showing standardised antidepressant prescription rates proportional to NHS Health Board population and average daylight hours per month from March 2024 to March 2025, faceted by Scottish Geographical Region (North, East, and West)
+3.1. Bar chart graph showing standardised antidepressant prescription rates proportional to NHS Health Board population and average daylight hours per month from March 2024 to March 2025, faceted by Scottish Geographical Region (North, East, and West).
 
 ```{r}
-library(ggplot2)
-library(ggtext)
+composite_analysis <- analysis_prescr_smid %>% 
+  group_by(region, season) %>% 
+  summarise(av_items_per_1000 = mean(items_per_1000, na.rm = TRUE), av_daylight = mean(daylight_hrs, na.rm = TRUE)) %>% 
+  ungroup() %>% 
+  mutate(season = factor(season, levels = c("Spring", "Summer", "Autumn", "Winter")))
 
-regional_analysis_composite <- analysis_antidepr_season
-ggplot(analysis_antidepr_season, aes(x = month)) +
-  geom_col(aes(y = av_daylight_hrs), fill = "skyblue", alpha = 0.6) +
-  geom_line(
-    aes(y = av_items_per_1000, color = "Antidepressant prescriptions per 1000 people"),
-    linewidth = 1.2, group = 1) +
-  facet_wrap(~ region, ncol = 3, scales = "free_x") +
+composite_plot <- composite_analysis %>% 
+ggplot(aes(x = season)) +
+  geom_col(aes(y = av_daylight), fill = "skyblue", alpha = 0.6) +
+  geom_col(aes(y = av_items_per_1000), fill = "darkred", alpha = 0.6) +
+  facet_wrap(~region, nrow = 1, scales = "free_x") +
   scale_y_continuous(
-    name = "Average Daylight Hours (hrs)",
-    sec.axis = sec_axis(~ ., name = "Average Antidepressant prescriptions (units/1000 people)")) +
-  scale_x_date(
-    date_labels = "%b\n%Y",
-    breaks = "1 month",
-    expand = c(0.01, 0.01)) +
-  scale_color_manual(values = c("Antidepressant prescriptions per 1000 people" = "darkred")) +
+    name = "Average Total Daylight (hrs)",
+    sec.axis = sec_axis(~ ., name = "Average Antidepressant Prescriptions (units/1000 people)")) +
   labs(
-    title = "Antidepressant prescriptions and Average Daylight hours from March 2024 - March 2025 by Scottish Geographical Region",
-    x = "Month",
-    caption = "Bars = Daylight Hours | Line = Antidepressant Prescriptions") +
+    title = "Average seasonal total daylight hours and average antidepressant prescription items by region",
+    subtitle = "Prescriptions to daylight axis for visual",
+    x = "Season",
+    y = "Average Total Daylight (hrs)") +
   theme_minimal(base_size = 13) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1),
     legend.position = "top",
     legend.title = element_blank(),
     strip.background = element_rect(fill = "gray90", color = NA),
     strip.text = element_text(face = "bold", size = 12),
-    plot.title = element_textbox_simple(),
+    plot.title = element_text(face = "bold", size = 12),
     plot.margin = margin(t = 20, r = 10, b = 20, l = 10, unit = "pt"))
-ggsave("regional_analysis_composite.png",width = 20, height = 20, units = "cm")
+ 
 
-regional_analysis_composite
+composite_plot
+
 ```
 
-3.3. Geospatial analysis of prescriptions per season per Health Board
-```{r}
-library(patchwork)
+Prescriptions seem to marginally increase from Spring to Winter. However, summer seasons across regions don't show the lowest average antidepressant prescriptions. It seems that antidepressant prescription trends increase as the seasonal year progresses.
 
-map_antidepr_seasons <- analysis_geo_antidepr %>%
+3.2. Geospatial analysis of prescriptions per season per Health Board
+
+```{r}
+
+map_prescr_seasons <- analysis_geo_prescr %>% 
   ggplot() +
-  geom_sf(aes(fill = av_items_per_1000), size = 0.1, colour = "darkgrey")+
-  scale_fill_distiller(
-    palette = "Blues", 
-    direction = 1
-  ) +
-  facet_wrap(~season, nrow = 1)+
-   labs(title = "Seasonal Antidepressant Prescriptions (March 2024 - February 2025)", subtitle = "Prescriptions by Scottish Health Board per 1000 people", fill = "") +
-  theme_void()+
+  geom_sf(aes(fill = av_items_per_1000), size = 0.15, color = "darkgrey") +
+  scale_fill_distiller(palette = "Blues", direction = 1) +
+  facet_wrap(~season, nrow = 1) +
+   labs(title = "Seasonal Antidepressant Prescriptions (March 2024 - February 2025)", subtitle = "Prescriptions by Scottish Health Board per 1000 people comparable with Average Total Daylight (hrs)", fill = "units/1000 people") +
+  theme_void() +
   theme(
     plot.title = element_text(face = "bold", size = 10),
     plot.subtitle = element_text(size = 9), 
-    legend.title = element_text(face = "bold", size = 10)
-  )
+    legend.title = element_text(face = "bold", size = 10))
 
-map_daylight_seasons <- analysis_geo_antidepr %>%
+map_daylight_seasons <- analysis_geo_prescr %>% 
   ggplot() +
-  geom_sf(aes(fill = av_daylight_hrs), size = 0.1, colour = "darkgrey")+
-  scale_fill_distiller(
-    palette = "Oranges", 
-    direction = 1
-  ) +
-  facet_wrap(~season, nrow = 1)+
-   labs(title = "Seasonal Total Daylight Hours (March 2024 - February 2025)", fill = "") +
-  theme_void()+
-  theme(
-    plot.title = element_text(face = "bold", size = 10),
-    legend.title = element_text(face = "bold", size = 10)
-  )
+  geom_sf(aes(fill = av_daylight), size = 0.15, colour = "darkgrey") +
+  scale_fill_distiller(palette = "Oranges", direction = 1) +
+  facet_wrap(~season, nrow = 1) +
+  labs(fill = "Av. Total Daylight (hrs)") +
+  theme_void() +
+  theme(legend.title = element_text(face = "bold", size = 10))
 
-map_antidepr_daylight <- map_antidepr_seasons / map_daylight_seasons +
+full_map_plot <- map_prescr_seasons / map_daylight_seasons +
   plot_layout(heights = c(1,1))
 
-map_antidepr_daylight
+full_map_plot
 ```
 
-3.4. Geospatial analysis of SMID quintiles and prescription analysis
+Seems like the southernmost Health Boards are situated, the higher the anitdepressant prescriptions per 1000 people there are. The choropleth map seems to show this as almost uniform despite seasonal changes despite varying daylight hours. The northernmost regions are not the ones with most prescriptions despite having the lowest total average daylight hours overall.\
+With this in mind, this investigation finishes with the alternative investigation of the third alternative hypothesis postulated initially about SMID ranks and antidepressant prescriptions during varying daylight seasons
+
+3.3. Geospatial analysis of SMID quintiles and prescription analysis
+
 ```{r}
 
-# Bivariate map
-library(cowplot)
-biv_bins <- analysis_geo_antidepr %>% 
+# Bivariate map bins
+biv_bins <- analysis_geo_prescr %>% 
   mutate(prescr_bin = ntile(av_items_per_1000,3),
-         smid_bin = ntile(SMID_rank, 3),
+         smid_bin = ntile(SMID_median_rank, 3),
          biv_class = paste0(prescr_bin, "-", smid_bin))
 
+# bivariate map bin colours
 biv_palette <- c(
   "1-1" = "#e8e8e8",
   "2-1" = "#b8d6be",
@@ -557,9 +461,11 @@ biv_palette <- c(
   "2-3" = "#df65b0",
   "3-3" = "#dd1c77")
 
+# bivariate map bin matrix
 biv_matrix <- expand.grid(prescr_bin = 1:3, smid_bin = 1:3) %>% 
   mutate(smid_bin = 4 - smid_bin, biv_class = paste0(prescr_bin, "-", smid_bin))
 
+# bivariate map legend
 biv_legend <- biv_matrix %>% 
   ggplot(aes(x = prescr_bin, y = smid_bin, fill = biv_class)) +
   geom_tile(color = "white") +
@@ -578,14 +484,15 @@ biv_legend <- biv_matrix %>%
     panel.grid = element_blank(),
     plot.margin = margin(t = 0, r = 5, b = 0, l = 0))
 
-map_biv <- biv_bins %>% 
+# bivariate map
+map_biv_solo <- biv_bins %>% 
   ggplot() +
   geom_sf(aes(fill = biv_class), size = 0.1, colour = "white") +
   scale_fill_manual(values = biv_palette, guide = "none") +
   facet_wrap(~season, nrow = 1) +
   labs(
-    title = "Bivariate Map showing Antidepressant prescription and SMID ranking",
-    subtitle = "Prescriptions per 1000 people across Scottish NHS Healthboard",
+    title = "Seasonal Antidepressant prescriptions comparison with Median Deprivation rankings",
+    subtitle = "Prescriptions per 1000 people across Scottish NHS Healthboard | Scottish Multiple Index of Deprivation (SMID) Rank",
     fill = "Bivariate classification") +
   coord_sf(expand = FALSE) +
   theme_void()+
@@ -595,36 +502,94 @@ map_biv <- biv_bins %>%
     panel.spacing = unit(0.1, "lines"),
     strip.text = element_text(face = "bold", size = 8),
     plot.margin = margin(t = 0, r = 10, b = 0, l = 10, unit = "pt"))
-  
-final_map_biv <- plot_grid(map_biv, biv_legend,
+
+
+full_bivariate_map <- plot_grid(map_biv_solo, biv_legend,
                            ncol = 2,
                            rel_widths = c(4, 1),
                            align = "t")
-final_map_biv
 
-# Interactive scatter plot
-smid_daylight_scatter <-plot_ly(
-  data = analysis_antidepr_smid,
-  x = ~SMID_rank,
-  y = ~av_items_per_1000,
-  color = ~hb_name,
-  text = ~paste0(
-    "<b>NHS Board:</b> ", hb_name, "<br>",
-    "<b>Season:</b> ", season, "<br>",
-    "<b>Prescriptions per 1000:</b> ",
-    round(av_items_per_1000, 1), "<br>",
-    "<b>SMID Rank:</b> ", SMID_rank),
-  hoverinfo = "text",
-  type = "scatter",
-  mode = "markers",
-  marker = list(size = 10, opacity = 0.8)) %>% 
-  layout(
-    title = list(text = "Seasonal Antidepressant Prescriptions and Health Board Deprivation rankings<sup><br> Prescriptions per 1000 people</sup>", x = 0.5, xanchor = "center"),
-    xaxis = list(title = "SMID Rank (Higher = Less Deprived)"),
-    yaxis = list(title = "Antidepressant Prescriptions (unit/per 1000)"),
-    margin = list(t = 90, r = 100, b = 85, l = 85))
-
-smid_daylight_scatter
+full_bivariate_map
 
 ```
 
+Lower SIMD ranks indicate more deprived Health Board populations. The general trend seems to be that the higher the SMID rank, the lesser the antidepressant prescriptions per Health Board. Only significant differences have been shown when comparing summer and winter, which do indicate that higher baseline prescribing is delivered more in deprived areas during the season with least sunshine throughout the year. This is also corroborated in the Figure 5 in the Appendix 1.4. which has been included for interest.
+
+# Conclusions
+
+There is evidence suggesting that antidepressant prescriptions increase during the winter period in several Health Board regions across Scotland. However, this remains an inference as statistical testing must be done to confirm significant differences between seasons.\
+Furthermore, Health board regional (latitudinal) differences exist. Northernmost boards with the least total average daylight show seasonal patterns most strikingly when comparing summer and winter data. These are visually consistent with the hypothesis.\
+Finally, deprived areas (lower SIMD rank) somewhat shows higher baseline prescribing. However, the introduction of this factor demonstrate that Deprivation superimposes seasonality, suggesting the social factors are also equally if not more important than environmental factors when researching depressive disorders within the population as a whole.
+
+# Limitations and Next Steps
+
+## Limitations
+
+-   Prescriptions have been used as a direct inference for mental health burden, meaning that these have missed undiagnosed or untreated cases and have included prescriptions that are not necessarily just utilised for depressive disorders (i.e. ADHD)
+-   The investigation window only spans a year (March 1st, 2024 - 28th February, 2025) which limits the assessment of the annual variability of results and trends.
+-   Daylight data was aggregated (Total daylight hours) suggesting that it might not reflect direct exposure or monthly trends within seasons.
+-   SMID rankings were summarised through medians at the Health Board level which potentially masks zonal differences within Health Boards.
+
+## Further Study
+
+This is a promising scope of study, hence, future research must be done to tackle how Seasonal Affective Disorder (SAD) tackles Scottish residence heterogeneously. Next steps are the following: - The study must be replicated over multiple years (5-10 years) to assess if these trends stand, or more so, if these have changed over time. This is elemental for the introduction of other socio-environmental factors to the study. - GP practice as datazones could be used to reduce bias and generalisations when summarising data. - As suggested beforehand, there are multiple factors affecting SAD (i.e. age demographics, prescription policies, etc), hence future studies should: - Control for compounding factors - Consider distinct research models. i.e. Mixed effects models
+
+# References
+
+# Appendix
+
+## Appendix 1.2. Season Categorisation as per Met Office UK Guidelines
+
+**Spring**: March, April, May\
+**Summer**: June, July, August\
+**Autumn**: September, October, November\
+**Winter**: December, January, February\
+
+## Appendix 1.3. NHS Health Board Geographical Categorisation
+
+This categorisation was made according to the Met Office's territorial delineation of Scotland based on the distribution of climate measurements as available in their website.
+
+**Northern Scotland**: NHS Highland, NHS Western Isles, NHS Orkney, NHS Shetland\
+**Eastern Scotland**: NHS Borders, NHS Lothian, NHS Fife, NHS Tayside, NHS Grampian, NHS Forth Valley\
+**Western Scotland**: NHS Ayrshire and Arran, NHS Dumfries and Galloway, NHS Greater Glasgow and Clyde, NHS Lanarkshire
+
+## Appendix 1.3. Met Office Seasonal Data (TXT files)
+
+North Scotland:\
+<https://www.metoffice.gov.uk/pub/data/weather/uk/climate/datasets/Sunshine/ranked/Scotland_N.txt>\
+
+East Scotland:\
+<https://www.metoffice.gov.uk/pub/data/weather/uk/climate/datasets/Sunshine/ranked/Scotland_E.txt>
+
+West Scotland:\
+<https://www.metoffice.gov.uk/pub/data/weather/uk/climate/datasets/Sunshine/ranked/Scotland_W.txt>
+
+## Appendix 1.4. Figure 5
+
+```{r}
+# Interactive scatter plot
+scatter_plot_data <- analysis_geo_prescr %>%
+  st_drop_geometry() %>% 
+  filter(!is.na(SMID_median_rank), !is.na(av_items_per_1000))
+  
+scatter_plot <- plot_ly(
+  data = scatter_plot_data,
+  x = ~SMID_median_rank,
+  y = ~av_items_per_1000,
+  type = "scatter",
+  mode = "markers",
+  color = ~hb_name,
+  text = ~paste0(
+    "HB:NHS ", hb_name, "<br>",
+    "Season: ", season, "<br>",
+    "Prescriptions/1000: ", round(av_items_per_1000,1), "<br>",
+    "Av. Total Daylight (hrs): ", round(av_daylight, 1)),
+    hoverinfo = "text",
+    marker = list(size = 10, opacity = 0.8)) %>%
+    layout(
+      xaxis = list(title = "SMID Rank (Higher = Less Deprived)"),
+      yaxis = list(title = "Antidepressant Prescriptions (units/1000)"),
+      margin = list (t = 90, r = 100, b = 85, l = 85))
+  
+  scatter_plot
+```

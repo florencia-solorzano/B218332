@@ -75,8 +75,9 @@ Variables were regionally and seasonally categorised according to Met Office UK 
 Raw data from multiple institutional websites include all medications prescribed by NHS Health Boards. To differentiate and include only Antidepressant prescriptions, only prescriptions with a BNF item code starting with **'0403'** were used.
 
 # Datasets Used {#datasets-used}
+
 The investigation window used was March 2024 to February 2025 (inclusive of March 1st, 2024 - February 28th, 2025) to assess the potential cyclical nature of results and make adequate comparisons between seasons.\
-All links mentioned below are included in the code within the  [Methodology](#methodology).
+All links mentioned below are included in the code within the [Methodology](#methodology).
 
 ## Datasets
 
@@ -86,7 +87,7 @@ All links mentioned below are included in the code within the  [Methodology](#me
 -   **Public Health Scotland - Deprivation:** "Scottish Index of Multiple Deprivation (SIMD 2020)" for all GP practices and Health Boards.
 -   **NHS Health Boards - Geospatial Data:** Data found in `docs\data` within the repo.
 
-# Methodology
+# Methodology {#methodology}
 
 ## 1. Data Loading and Wrangling
 
@@ -240,8 +241,7 @@ prescr_seasonal_standard <- prescr_seasonal %>%
 
 ### 1.10 Introducing Met Office UK daylight hours data and creating a new function
 
-This is somewhat challenging. Met Office sunshine datasets are provided as text files (.txt) with white spaces as delimiters. I converted them into .csv files using Excel to ensure reproducibility and easier data handling. These files can be found in the `docs\data` folder in the repo. A custom function was written to: a) extract the 2024 values for each region, b) reshape seasonal columns into long format, and c) standardise season naming. This produced a tidy dataset of seasonal **total** daylight hours per region.
-> Note: these .csv files contain columns named `spr`, `sum`, `aut`, `win` and a year column for each year and season
+This is somewhat challenging. Met Office sunshine datasets are provided as text files (.txt) with white spaces as delimiters. I converted them into .csv files using Excel to ensure reproducibility and easier data handling. These files can be found in the `docs\data` folder in the repo. A custom function was written to: a) extract the 2024 values for each region, b) reshape seasonal columns into long format, and c) standardise season naming. This produced a tidy dataset of seasonal **total** daylight hours per region. \> Note: these .csv files contain columns named `spr`, `sum`, `aut`, `win` and a year column for each year and season
 
 ```{r}
 # reading all CSV files first
@@ -541,7 +541,6 @@ Limited studies in Scotland suggest that 9% of the population suffers SAD yearly
 -   The investigation window only spans a year (March 1st, 2024 - 28th February, 2025) which limits the assessment of the annual variability of results and trends.
 -   Daylight data was aggregated (Total daylight hours) suggesting that it might not reflect direct exposure or monthly trends within seasons.
 -   SIMD rankings were summarised through medians at the Health Board level which potentially masks zonal differences within Health Boards.
-
 
 # References {#references}
 

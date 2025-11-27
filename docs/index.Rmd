@@ -6,7 +6,7 @@ output:
     toc: true
     toc_depth: 2
     toc_float: true
-    code_folding: show
+    code_folding: hide
 ---
 
 ```{css, echo=FALSE}
@@ -115,12 +115,12 @@ urls_prescr <- list(
   prescr_july_dec_2024 <- "https://www.opendata.nhs.scot/dataset/84393984-14e9-4b0d-a797-b288db64d088/resource/f3b9f2e2-66c0-4310-9b8e-734781d2ed0a/download/hb_pitc2024_07_12-1.csv",
   prescr_jan_june_2025 <- "https://www.opendata.nhs.scot/dataset/84393984-14e9-4b0d-a797-b288db64d088/resource/9de908b3-9c28-4cc3-aa32-72350a0579d1/download/hb_pitc2025_01_06.csv")
 
-# Reads all Health Board prescription data in a loop to avoid repetition
+# reads all Health Board prescription data in a loop to avoid repetition
 prescr_list <- map(urls_prescr,
                    ~read_csv(.x) %>%
                      clean_names())
 
-# Binds together everything in a single tibble
+# binds together everything in a single tibble
 prescr_raw <- bind_rows(prescr_list, .id = "source_file") %>% 
   mutate(paid_date_month = str_trim(as.character(paid_date_month))) %>% 
   select(-source_file)
@@ -133,7 +133,7 @@ glimpse(prescr_raw)
 Filtering out by "bnf_item_code" to keep only those prescriptions that are antidepressants (codes starting with '0403') and that were prescribed within [investigation window](#datasets-used).
 
 ```{r}
-# Only keeping antidepressant codes and aggregating prescriptions per HB per month
+# keeps antidepressant codes and aggregates prescriptions per HB per month
 prescr_monthly <- prescr_raw %>%
   filter(!is.na(bnf_item_code)) %>% 
   filter(str_detect(bnf_item_code, "^0403")) %>%
@@ -142,7 +142,7 @@ prescr_monthly <- prescr_raw %>%
   summarise(number_of_items = sum(number_of_paid_items, na.rm = TRUE)) %>% 
   arrange(paid_date_month)
   
-# Subsetting to fit our investigation window 
+# subsetting to fit investigation window 
 prescr_monthly <- prescr_monthly %>% 
   filter(paid_date_month >= 202403, paid_date_month <= 202502)
 
@@ -169,7 +169,7 @@ seasons_202425 <- tibble(
 ### 1.5 Allocating Met Office regional categorisations to all NHS Scottish Health Boards
 
 ```{r}
-# Health Board official NHS names list
+# health board official NHS names list
 hb_names <- read_csv("https://www.opendata.nhs.scot/dataset/9f942fdb-e59e-44f5-b534-d6e17229cc7b/resource/652ff726-e676-4a20-abda-435b98dd7bdc/download/hb14_hb19.csv") %>% 
   clean_names()
 
@@ -184,7 +184,7 @@ metoffice_hb_region <- tibble(
              rep("East", length(east_hb)),
              rep("West", length(west_hb))))
 
-# Health Boards per region according to Met Office scottish territorial classifications
+# health boards per region according to Met Office scottish territorial classifications
 hb_regional <- hb_names %>% 
   full_join(metoffice_hb_region, by = "hb_name") %>% 
   select(-c(hb_date_archived, hb_date_archived, hb_date_enacted, country))
@@ -244,7 +244,7 @@ This is somewhat challenging. Met Office sunshine datasets are provided as text 
 > Note: these .csv files contain columns named `spr`, `sum`, `aut`, `win` and a year column for each year and season
 
 ```{r}
-# Reading all CSV files first
+# reading all CSV files first
 daylight_north <- read_table(here("docs", "data", "R_north_scotland_sunshine.csv")) %>%
   clean_names()
 
@@ -254,7 +254,7 @@ daylight_east <- read_table(here("docs","data", "R_east_scotland_sunshine.csv"))
 daylight_west <- read_table(here("docs","data","R_west_scotland_sunshine.csv")) %>% 
   clean_names()
 
-# Making a function to avoid code repetition for each .csv file
+# making a function 
 daylight_season_function <- function(data, region_name, year_filter, season_cols = c("win", "spr", "sum", "aut"), year_cols = c("year_12", "year_13", "year_14", "year_15"), full_season_names = c("Winter", "Spring", "Summer", "Autumn")) {
   # built-in checker
   if(length(season_cols)!= length(year_cols)) stop("season_cols and year_cols need to have the same length")
@@ -282,7 +282,7 @@ daylight_season_function <- function(data, region_name, year_filter, season_cols
 `daylight_season_function()` was used to wrangle and select specific data from each Met Office regional daylight dataset. `all_seasons_daylight` contains all total daylight hours per season per region for the duration of the [investigation window](#datasets-used).
 
 ```{r}
-# Using the function for each region and making sure the "year" category is a character
+# using the function for each region and making sure the "year" category is a character
 season_daylight_north <- daylight_season_function(daylight_north, "North", "2024")
 season_daylight_north <- season_daylight_north %>% 
   mutate(year = as.character(year))
@@ -295,7 +295,7 @@ season_daylight_west <- daylight_season_function(daylight_west, "West", "2024")
 season_daylight_west <- season_daylight_west %>% 
   mutate(year = as.character(year))
 
-# Merging all regional daylight data for each season
+# merging all regional daylight data for each season
 all_seasons_daylight <- bind_rows(season_daylight_north, season_daylight_east, season_daylight_west)
 
 all_seasons_daylight
@@ -304,7 +304,7 @@ all_seasons_daylight
 ### 1.12. Loading and merging SIMD ranking data
 
 ```{r}
-# Median rank per Health Board was used to summarise the distribution of deprivation
+# median rank per Health Board was used to summarise the distribution of deprivation
 simd_raw <- read_csv("https://www.opendata.nhs.scot/dataset/78d41fa9-1a62-4f7b-9edb-3e8522a93378/resource/acade396-8430-4b34-895a-b3e757fa346e/download/simd2020v2_22062020.csv") %>% 
   clean_names()
 
@@ -314,12 +314,12 @@ simd_hb <- simd_raw %>%
   summarise(SIMD_median_rank = median(simd2020v2rank, na.rm = TRUE)) %>% 
   ungroup()
 
-# Joining daylight, SIMD and seasonal prescription data
+# joining daylight, SIMD and seasonal prescription data
 analysis_prescr_simd <- prescr_seasonal_standard %>%
   full_join(all_seasons_daylight, by = join_by(season, region)) %>% 
   full_join(simd_hb, by = join_by(hbt == hb))
 
-# Checking if any NAs are present
+# checking if any NAs are present
 analysis_prescr_simd %>% 
   summarise(missing_daylight = sum(is.na(daylight_hrs)), missing_simd =  sum(is.na(SIMD_median_rank))) # result should show a 14 x 3 tibble with value zero (0) for each
 ```
@@ -457,7 +457,7 @@ As seen, there are season daylight changes specific to each region with Western 
 Figure 4 shows geospatial visualisation of whether SIMD rankings and antidepressant prescriptions are correlated.
 
 ```{r}
-# Bivariate map bins
+# bivariate map bins
 biv_bins <- analysis_geo_prescr %>% 
   mutate(prescr_bin = ntile(av_items_per_1000,3),
          simd_bin = ntile(SIMD_median_rank, 3),
